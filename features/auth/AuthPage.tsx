@@ -5,8 +5,10 @@ import type { FormEvent } from "react";
 import Button from "@/components/ui/Button";
 import FormField from "@/components/ui/FormField";
 import AuthPanel from "./AuthPanel";
-import { authApi } from "./auth-api";
+import { authApi, AuthApiError } from "./auth-api";
 import { useRouter } from "next/navigation";
+import type { AuthResponse } from "./auth-api";
+import useOtpCooldown from "./useOtpCooldown";
 
 type View = 'LOGIN' | 'REGISTER' | 'OTP';
 type Message = { text: string; error: boolean };
@@ -18,62 +20,182 @@ const copy = {
 
 export default function AuthPage() {
   const router = useRouter();
-  const [view, setView] = useState<View>('LOGIN');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+
+  const [view, setView] = useState<View>("LOGIN");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [role, setRole] = useState(0);
-  const [otpCode, setOtpCode] = useState('');
+  const [otpCode, setOtpCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [resending, setResending] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
+
+  const { remainingSeconds, startCooldown } = useOtpCooldown();
+  const loading = submitting || resending;
 
   function switchView(next: View) {
     if (loading) return;
+
     setView(next);
     setMessage(null);
-    setPassword('');
+    setPassword("");
     setShowPassword(false);
-    setOtpCode('');
+    setOtpCode("");
+  }
+
+  function getSuccessMessage(
+    data: AuthResponse,
+    fallback: string,
+  ): string {
+    const text = data.message || fallback;
+
+    if (
+      process.env.NODE_ENV === "development" &&
+      data.mockEmailInbox
+    ) {
+      return `${text} (${data.mockEmailInbox})`;
+    }
+
+    return text;
+  }
+
+  function openVerification() {
+    if (loading) return;
+
+    if (!email.trim()) {
+      setMessage({
+        text: "Isi email akun yang ingin diverifikasi terlebih dahulu.",
+        error: true,
+      });
+      return;
+    }
+
+    setEmail(email.trim());
+    switchView("OTP");
+  }
+
+  async function resendOtp() {
+    if (loading || remainingSeconds > 0) return;
+
+    const accountEmail = email.trim();
+
+    if (!accountEmail) {
+      setMessage({ text: "Email wajib diisi.", error: true });
+      return;
+    }
+
+    setResending(true);
+    setMessage(null);
+
+    try {
+      const data = await authApi.resendOtp(accountEmail);
+
+      setEmail(accountEmail);
+      setOtpCode("");
+      startCooldown(data.retryAfterSeconds ?? 60);
+
+      setMessage({
+        text: getSuccessMessage(
+          data,
+          "OTP baru telah diterbitkan. Periksa email kamu.",
+        ),
+        error: false,
+      });
+    } catch (error) {
+      if (error instanceof AuthApiError && error.status === 429) {
+        startCooldown(error.retryAfterSeconds ?? 60);
+      }
+
+      setMessage({
+        text:
+          error instanceof Error
+            ? error.message
+            : "Gagal meminta OTP baru.",
+        error: true,
+      });
+    } finally {
+      setResending(false);
+    }
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (loading) return;
-    setLoading(true);
-    setMessage(null);
-    try {
-      const normalizedEmail = email.trim();
-      if (view === 'REGISTER') {
-        const data = await authApi.register({ email: normalizedEmail, password, fullName: fullName.trim(), phoneNumber: '', role });
-        setEmail(normalizedEmail);
-        setView('OTP');
-        setPassword('');
-        setShowPassword(false);
-        setOtpCode('');
-        setMessage({ text: data.message || 'Akun berhasil dibuat. Periksa email untuk kode verifikasi.', error: false });
-        // Development-only mock inbox from the existing backend.
-        if (process.env.NODE_ENV === 'development' && data.mockEmailInbox) {
-          setMessage({ text: `${data.message || 'Akun berhasil dibuat.'} (${data.mockEmailInbox})`, error: false });
-        }
-      } else if (view === 'OTP') {
-        await authApi.verifyOtp(normalizedEmail, otpCode);
-        setView('LOGIN');
-        setOtpCode('');
-        setPassword('');
-        setMessage({ text: 'Email berhasil diverifikasi. Silakan masuk.', error: false });
-      } else {
-        await authApi.login(normalizedEmail, password);
 
+    if (loading) return;
+
+    setSubmitting(true);
+    setMessage(null);
+
+    const accountEmail = email.trim();
+
+    try {
+      if (view === "REGISTER") {
+        const data = await authApi.register({
+          email: accountEmail,
+          password,
+          fullName: fullName.trim(),
+          phoneNumber: "",
+          role,
+        });
+
+        setEmail(accountEmail);
+        setView("OTP");
+        setPassword("");
+        setShowPassword(false);
+        setOtpCode("");
+        startCooldown(data.retryAfterSeconds ?? 60);
+
+        setMessage({
+          text: getSuccessMessage(
+            data,
+            "Akun berhasil dibuat. Silakan verifikasi email.",
+          ),
+          error: false,
+        });
+      } else if (view === "OTP") {
+        const data = await authApi.verifyOtp(accountEmail, otpCode);
+
+        setView("LOGIN");
+        setOtpCode("");
         setPassword("");
 
-        router.replace("/");
+        setMessage({
+          text:
+            data.message ||
+            "Email berhasil diverifikasi. Silakan masuk.",
+          error: false,
+        });
+      } else {
+        await authApi.login(accountEmail, password);
+
+        setPassword("");
+        router.replace("/account");
         router.refresh();
       }
     } catch (error) {
-      setMessage({ text: error instanceof Error ? error.message : 'Terjadi kesalahan. Coba kembali.', error: true });
+      if (
+        view === "REGISTER" &&
+        error instanceof AuthApiError &&
+        error.code === "AUTH_VERIFICATION_REQUIRED"
+      ) {
+        setEmail(accountEmail);
+        setView("OTP");
+        setPassword("");
+        setShowPassword(false);
+        setOtpCode("");
+      }
+
+      setMessage({
+        text:
+          error instanceof Error
+            ? error.message
+            : "Terjadi kesalahan. Silakan coba kembali.",
+        error: true,
+      });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -110,12 +232,14 @@ export default function AuthPage() {
             <form onSubmit={submit} aria-busy={loading} className="mt-7">
               <fieldset disabled={loading} className="space-y-5">
                 <legend className="sr-only">{copy[view].title}</legend>
-                {view === 'REGISTER' && <FormField id="full-name" label="Nama lengkap" autoComplete="name" required value={fullName}
+                {view === 'REGISTER' && <FormField id="full-name" label="Nama lengkap" minLength={2}
+maxLength={100} autoComplete="name" required value={fullName}
                   onChange={event => setFullName(event.target.value)} placeholder="Nama lengkap kamu" pattern=".*\S.*" />}
-                {view !== 'OTP' && <FormField id="email" label="Email" type="email" autoComplete="email" required value={email}
+                {view !== 'OTP' && <FormField id="email" label="Email" maxLength={254} type="email" autoComplete="email" required value={email}
                   onChange={event => setEmail(event.target.value)} placeholder="nama@contoh.com" />}
                 {view !== 'OTP' && (
-                  <FormField id="password" label="Password" type={showPassword ? 'text' : 'password'}
+                  <FormField id="password" label="Password" minLength={view === "REGISTER" ? 15 : undefined}
+maxLength={view === "REGISTER" ? 72 : undefined} type={showPassword ? 'text' : 'password'}
                     autoComplete={view === 'LOGIN' ? 'current-password' : 'new-password'} required value={password}
                     onChange={event => setPassword(event.target.value)}
                     placeholder={view === 'LOGIN' ? 'Masukkan password' : 'Buat password'}
@@ -140,19 +264,76 @@ export default function AuthPage() {
                   pattern="[0-9]{6}" maxLength={6} required value={otpCode} placeholder="000000" hint="Masukkan 6 digit angka dari email verifikasi."
                   onChange={event => setOtpCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
                   className="text-center font-mono text-2xl tracking-[0.35em]" />}
-                <Button type="submit" loading={loading} disabled={view === 'OTP' && !/^\d{6}$/.test(otpCode)} className="w-full">
+                <Button type="submit" loading={submitting}
+                  disabled={
+                    loading ||
+                    (view === "OTP" && !/^\d{6}$/.test(otpCode))
+                  } className="w-full">
                   {view === 'LOGIN' ? 'Masuk ke akun' : view === 'REGISTER' ? 'Buat akun' : 'Verifikasi email'}
                 </Button>
               </fieldset>
             </form>
             <div className="mt-7 border-t border-border pt-5 text-center text-sm text-muted">
-              {view === 'OTP' ? (
-                <button type="button" disabled={loading} onClick={() => switchView('REGISTER')} className="rounded-lg px-2 py-1 font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover disabled:opacity-60">Kembali ke pendaftaran</button>
+              {view === "OTP" ? (
+                <div className="space-y-4">
+                  <p>
+                    Kode kedaluwarsa atau belum menerima kode?
+                  </p>
+
+                  <Button
+                    type="button"
+                    loading={resending}
+                    disabled={loading || remainingSeconds > 0}
+                    onClick={resendOtp}
+                    className="w-full"
+                  >
+                    {remainingSeconds > 0
+                      ? `Kirim ulang dalam ${remainingSeconds} detik`
+                      : "Kirim ulang OTP"}
+                  </Button>
+
+                  <p className="text-xs leading-5">
+                    Setelah meminta kode baru, gunakan OTP terbaru.
+                  </p>
+
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => switchView("LOGIN")}
+                    className="rounded-lg px-2 py-1 font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover disabled:opacity-60"
+                  >
+                    Kembali ke login
+                  </button>
+                </div>
               ) : (
-                <p>{view === 'LOGIN' ? 'Belum punya akun?' : 'Sudah punya akun?'}{' '}
-                  <button type="button" disabled={loading} onClick={() => switchView(view === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
-                    className="rounded-lg px-2 py-1 font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover disabled:opacity-60">{view === 'LOGIN' ? 'Daftar sekarang' : 'Masuk di sini'}</button>
-                </p>
+                <div className="space-y-3">
+                  <p>
+                    {view === "LOGIN"
+                      ? "Belum punya akun?"
+                      : "Sudah punya akun?"}{" "}
+                    <button
+                      type="button"
+                      disabled={loading}
+                      onClick={() =>
+                        switchView(view === "LOGIN" ? "REGISTER" : "LOGIN")
+                      }
+                      className="rounded-lg px-2 py-1 font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover disabled:opacity-60"
+                    >
+                      {view === "LOGIN" ? "Daftar sekarang" : "Masuk di sini"}
+                    </button>
+                  </p>
+
+                  {view === "LOGIN" && (
+                    <button
+                      type="button"
+                      disabled={loading}
+                      onClick={openVerification}
+                      className="rounded-lg px-2 py-1 font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover disabled:opacity-60"
+                    >
+                      Akun belum aktif? Lanjutkan verifikasi
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>

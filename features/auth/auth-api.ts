@@ -1,10 +1,12 @@
-export type UserRole = "Customer" | "Seller" | "SuperAdmin";
+export type AuthRole = "Customer" | "Seller" | "SuperAdmin";
 
 export type AuthResponse = {
   message?: string;
-  token?: string;
-  role?: UserRole;
+  code?: string;
+  role?: AuthRole;
   mockEmailInbox?: string;
+  expiresAt?: string;
+  retryAfterSeconds?: number;
 };
 
 export type RegisterPayload = {
@@ -19,6 +21,8 @@ export class AuthApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
+    public readonly code?: string,
+    public readonly retryAfterSeconds?: number,
   ) {
     super(message);
     this.name = "AuthApiError";
@@ -26,50 +30,39 @@ export class AuthApiError extends Error {
 }
 
 const BASE_URL = (
-  process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:5175/api/Auth"
-).replace(/\/$/, "");
+  process.env.NEXT_PUBLIC_AUTH_API_URL || "http://localhost:5000/api/Auth"
+).replace(/\/+$/, "");
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function getMessage(data: Record<string, unknown>): string | undefined {
+  if (typeof data.message === "string") return data.message;
+
+  if (data.errors && typeof data.errors === "object") {
+    const messages = Object.values(
+      data.errors as Record<string, unknown>,
+    ).flatMap((value) =>
+      Array.isArray(value)
+        ? value.filter((item): item is string => typeof item === "string")
+        : [],
+    );
+
+    if (messages.length) return messages.join(" ");
+  }
+
+  return typeof data.title === "string" ? data.title : undefined;
 }
 
-function isUserRole(value: unknown): value is UserRole {
-  return value === "Customer" || value === "Seller" || value === "SuperAdmin";
-}
-
-function getMessage(body: unknown): string | undefined {
-  if (typeof body === "string") {
-    return body.trim() || undefined;
-  }
-
-  if (!isObject(body)) return undefined;
-
-  if (typeof body.message === "string" && body.message.trim()) {
-    return body.message;
-  }
-
-  if (isObject(body.errors)) {
-    const messages = Object.values(body.errors)
-      .flatMap((value) => (Array.isArray(value) ? value : []))
-      .filter((value): value is string => typeof value === "string");
-
-    if (messages.length > 0) return messages.join(" ");
-  }
-
-  if (typeof body.title === "string") {
-    return body.title;
-  }
-
-  return undefined;
+function getSeconds(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? Math.ceil(value)
+    : undefined;
 }
 
 async function post(
   endpoint: string,
   payload: unknown,
-  baseUrl: string = BASE_URL,
+  baseUrl = BASE_URL,
 ): Promise<AuthResponse> {
   let response: Response;
-  let text: string;
 
   try {
     response = await fetch(`${baseUrl}/${endpoint}`, {
@@ -80,8 +73,6 @@ async function post(
       },
       body: JSON.stringify(payload),
     });
-
-    text = await response.text();
   } catch {
     throw new AuthApiError(
       "Tidak dapat terhubung. Periksa koneksi dan pastikan backend berjalan.",
@@ -89,58 +80,72 @@ async function post(
     );
   }
 
-  let body: unknown = null;
+  const text = await response.text();
+  let raw: unknown;
 
-  if (text.trim()) {
-    try {
-      body = JSON.parse(text);
-    } catch {
-      if (response.headers.get("content-type")?.includes("text/plain")) {
-        body = text;
-      }
-    }
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    raw = response.headers.get("Content-Type")?.includes("text/plain")
+      ? text
+      : null;
   }
 
-  const message = getMessage(body);
+  const data: Record<string, unknown> =
+    raw && typeof raw === "object" && !Array.isArray(raw)
+      ? (raw as Record<string, unknown>)
+      : {};
+
+  const message = typeof raw === "string" ? raw : getMessage(data);
+  const code = typeof data.code === "string" ? data.code : undefined;
+
+  const retryHeader = response.headers.get("Retry-After");
+  const retryAfterSeconds =
+    getSeconds(data.retryAfterSeconds) ??
+    (retryHeader !== null ? getSeconds(Number(retryHeader)) : undefined);
 
   if (!response.ok) {
     throw new AuthApiError(
       message || "Permintaan gagal. Silakan coba kembali.",
       response.status,
+      code,
+      retryAfterSeconds,
     );
   }
 
-  const data = isObject(body) ? body : {};
+  const role =
+    data.role === "Customer" ||
+    data.role === "Seller" ||
+    data.role === "SuperAdmin"
+      ? data.role
+      : undefined;
 
   return {
     message,
-    token: typeof data.token === "string" ? data.token : undefined,
-    role: isUserRole(data.role) ? data.role : undefined,
+    code,
+    role,
+    retryAfterSeconds,
+    expiresAt: typeof data.expiresAt === "string" ? data.expiresAt : undefined,
     mockEmailInbox:
       typeof data.mockEmailInbox === "string" ? data.mockEmailInbox : undefined,
   };
 }
 
 export const authApi = {
-  async register(payload: RegisterPayload) {
-    if (payload.role !== 0 && payload.role !== 1) {
-      throw new AuthApiError("Jenis akun harus Customer atau Seller.", 400);
-    }
-
-    return post("register", payload);
-  },
-
-  verifyOtp(email: string, otpCode: string) {
-    return post("verify-otp", { email, otpCode });
-  },
-
   async login(email: string, password: string) {
     const data = await post("login", { email, password }, "/api/auth");
 
     if (!data.role) {
-      throw new AuthApiError("Respons login belum lengkap.", 502);
+      throw new AuthApiError("Respons login tidak valid.", 502);
     }
 
     return data;
   },
+
+  register: (payload: RegisterPayload) => post("register", payload),
+
+  verifyOtp: (email: string, otpCode: string) =>
+    post("verify-otp", { email, otpCode }),
+
+  resendOtp: (email: string) => post("resend-otp", { email }),
 };
