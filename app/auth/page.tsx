@@ -1,5 +1,14 @@
-import AuthPage from "@/features/auth/AuthPage";
+import { redirect } from "next/navigation";
 
-export default function Page() {
+import AuthPage from "@/features/auth/AuthPage";
+import { getSession } from "@/lib/auth/session";
+
+export default async function Page() {
+  const user = await getSession();
+
+  if (user) {
+    redirect("/account");
+  }
+
   return <AuthPage />;
 }
