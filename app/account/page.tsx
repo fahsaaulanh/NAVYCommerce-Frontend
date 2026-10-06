@@ -23,7 +23,7 @@ export default async function AccountPage() {
     { label: "Peran", value: roleLabels[user.role] },
   ]
 
-   return (
+  return (
     <section
       aria-labelledby="account-title"
       className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 lg:py-16"
@@ -81,6 +81,11 @@ export default async function AccountPage() {
         </dl>
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border bg-background/50 p-6 sm:px-8">
+          {user.role === "Seller" && (
+            <Link href="/seller/stores" className="action-button">
+              Toko Saya
+            </Link>
+          )}
           <Link
             href="/"
             className="rounded-lg px-2 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover"
