@@ -82,8 +82,8 @@ export default async function AccountPage() {
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border bg-background/50 p-6 sm:px-8">
           {user.role === "Seller" && (
-            <Link href="/seller/stores" className="action-button">
-              Toko Saya
+            <Link href="/seller" className="action-button">
+              Buka Seller Center
             </Link>
           )}
           <Link

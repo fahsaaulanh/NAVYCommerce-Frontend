@@ -214,3 +214,99 @@ body {
     transform: none;
   }
 }
+
+/* Variasi tombol pendamping */
+.action-button.action-button--secondary {
+  background-image: none;
+  background-color: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
+  box-shadow: none;
+}
+
+.action-button.action-button--secondary:not(:disabled):hover,
+.action-button.action-button--secondary:focus-visible {
+  background-color: color-mix(in srgb, var(--primary) 14%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  filter: none;
+  box-shadow: 0 6px 16px -10px var(--primary);
+}
+
+/* Aksi tambahan */
+.action-button.action-button--ghost {
+  background-image: none;
+  background-color: transparent;
+  color: var(--muted);
+  box-shadow: none;
+}
+
+.action-button.action-button--ghost:not(:disabled):hover,
+.action-button.action-button--ghost:focus-visible {
+  background-color: color-mix(in srgb, var(--primary) 7%, var(--surface));
+  color: var(--primary);
+  filter: none;
+  box-shadow: none;
+}
+
+.action-button.action-button--secondary:not(:disabled):active,
+.action-button.action-button--ghost:not(:disabled):active {
+  transform: translateY(0);
+  filter: none;
+}
+
+/* Kartu toko */
+.store-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--surface);
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px -16px var(--panel);
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.store-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  box-shadow: 0 18px 40px -24px color-mix(
+    in srgb, var(--primary) 50%, transparent
+  );
+}
+
+.store-card__decoration {
+  position: absolute;
+  right: -2rem;
+  top: -2rem;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  pointer-events: none;
+}
+
+.store-card__arrow {
+  transition: transform 220ms ease;
+}
+
+.store-card:hover .store-card__arrow {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-card,
+  .store-card__arrow {
+    transition: none;
+  }
+
+  .store-card:hover,
+  .store-card:hover .store-card__arrow {
+    transform: none;
+  }
+}

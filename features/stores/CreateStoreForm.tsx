@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import FormField from "@/components/ui/FormField";
 import { createStoreAction } from "./actions";
 import type { CreateStoreState } from "./types";
+import Icon from "@/components/ui/Icon";
 
 const initialState: CreateStoreState = {};
 
@@ -158,6 +159,7 @@ export default function CreateStoreForm() {
           type="submit"
           loading={pending}
           className="w-full"
+          icon={<Icon name="plus" />}
         >
           Buat toko
         </Button>
