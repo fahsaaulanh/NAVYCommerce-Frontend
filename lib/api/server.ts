@@ -15,9 +15,11 @@ export class BackendApiError extends Error {
   }
 }
 
+type BackendMethod = "GET" | "POST" | "PUT" | "DELETE";
+
 async function backendRequest<T>(
   path: string,
-  method: "GET" | "POST",
+  method: BackendMethod,
   body?: unknown,
 ): Promise<T> {
   const user = await getSession();
@@ -43,23 +45,35 @@ async function backendRequest<T>(
     throw new Error("Path backend tidak valid.");
   }
 
+  const isMultipart = body instanceof FormData;
+
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+
+  if (body !== undefined && !isMultipart) {
+    headers["Content-Type"] = "application/json";
+  }
+
   let response: Response;
 
   try {
     response = await fetch(`${baseUrl}${path}`, {
       method,
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      headers,
+      body:
+        body === undefined
+          ? undefined
+          : isMultipart
+            ? body
+            : JSON.stringify(body),
       cache: "no-store",
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(isMultipart ? 30_000 : 10_000),
     });
   } catch {
     throw new BackendApiError(
-      "Backend tidak dapat dihubungi. Silakan coba kembali.",
+      "Respons backend tidak diterima. Periksa hasil tindakan sebelum mencoba kembali.",
       503,
     );
   }
@@ -93,7 +107,11 @@ async function backendRequest<T>(
         ? "Session tidak diterima backend. Silakan login kembali."
         : response.status === 403
           ? "Kamu tidak memiliki izin untuk melakukan tindakan ini."
-          : "Permintaan gagal. Silakan coba kembali.";
+          : response.status === 413
+            ? "Ukuran file melebihi batas yang diizinkan."
+            : response.status >= 500
+              ? "Backend mengalami kendala. Silakan coba kembali."
+              : "Permintaan gagal. Silakan periksa data yang dikirim.";
 
     throw new BackendApiError(
       response.status >= 500
@@ -119,5 +137,17 @@ export function backendGet<T>(path: string): Promise<T> {
 }
 
 export function backendPost<T>(path: string, body: unknown): Promise<T> {
+  return backendRequest<T>(path, "POST", body);
+}
+
+export function backendPut<T>(path: string, body: unknown): Promise<T> {
+  return backendRequest<T>(path, "PUT", body);
+}
+
+export function backendDelete<T>(path: string): Promise<T> {
+  return backendRequest<T>(path, "DELETE");
+}
+
+export function backendUpload<T>(path: string, body: FormData): Promise<T> {
   return backendRequest<T>(path, "POST", body);
 }

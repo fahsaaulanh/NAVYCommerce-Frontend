@@ -310,3 +310,162 @@ body {
     transform: none;
   }
 }
+
+/* Shared buttons and links styled as buttons. */
+.action-button {
+  --button-background: var(--primary);
+  --button-hover-background: var(--primary-hover);
+  --button-color: var(--on-primary);
+  --button-border: transparent;
+  --button-hover-border: transparent;
+  --button-image: linear-gradient(
+    110deg,
+    var(--action-start),
+    var(--action-end),
+    var(--action-start)
+  );
+  --button-shadow:
+    0 4px 12px -6px
+    color-mix(in srgb, var(--primary) 45%, transparent);
+  --button-hover-shadow:
+    0 10px 22px -10px
+    color-mix(in srgb, var(--primary) 55%, transparent);
+
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  border: 1px solid var(--button-border);
+  border-radius: 0.875rem;
+  padding: 0.75rem 1.25rem;
+
+  background-color: var(--button-background);
+  background-image: var(--button-image);
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+
+  color: var(--button-color);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  text-decoration: none;
+
+  box-shadow: var(--button-shadow);
+
+  transition:
+    background-color 180ms ease,
+    background-position 250ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    filter 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.action-button--secondary {
+  --button-background:
+    color-mix(in srgb, var(--primary) 9%, var(--surface));
+  --button-hover-background:
+    color-mix(in srgb, var(--primary) 16%, var(--surface));
+  --button-color: var(--primary-hover);
+  --button-border:
+    color-mix(in srgb, var(--primary) 18%, var(--border));
+  --button-hover-border:
+    color-mix(in srgb, var(--primary) 38%, var(--border));
+  --button-image: none;
+  --button-shadow: none;
+  --button-hover-shadow: none;
+}
+
+.action-button--outline {
+  --button-background: transparent;
+  --button-hover-background: var(--background);
+  --button-color: var(--foreground);
+  --button-border: var(--border);
+  --button-hover-border:
+    color-mix(in srgb, var(--primary) 35%, var(--border));
+  --button-image: none;
+  --button-shadow: none;
+  --button-hover-shadow: none;
+}
+
+.action-button--ghost {
+  --button-background: transparent;
+  --button-hover-background:
+    color-mix(in srgb, var(--primary) 8%, var(--surface));
+  --button-color: var(--primary);
+  --button-image: none;
+  --button-shadow: none;
+  --button-hover-shadow: none;
+}
+
+.action-button--danger {
+  --button-background: var(--danger);
+  --button-hover-background:
+    color-mix(in srgb, var(--danger) 85%, black);
+  --button-color: #ffffff;
+  --button-image: none;
+  --button-shadow: none;
+  --button-hover-shadow:
+    0 8px 20px -12px
+    color-mix(in srgb, var(--danger) 60%, transparent);
+}
+
+.action-button--sm {
+  min-height: 2.5rem;
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.8125rem;
+}
+
+.action-button--icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border-radius: 0.75rem;
+}
+
+.action-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  background-position: 100% 50%;
+}
+
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: none;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .action-button:not(:disabled):hover {
+    background-color: var(--button-hover-background);
+    background-position: 100% 50%;
+    border-color: var(--button-hover-border);
+    filter: brightness(0.97);
+    transform: translateY(-1px);
+    box-shadow: var(--button-hover-shadow);
+  }
+}
+
+.action-button:not(:disabled):active {
+  filter: brightness(0.94);
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-button {
+    transition: none;
+  }
+
+  .action-button:not(:disabled):hover,
+  .action-button:not(:disabled):active {
+    transform: none;
+  }
+}
