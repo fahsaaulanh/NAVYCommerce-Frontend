@@ -2,13 +2,13 @@
 
 import { getSession } from "@/lib/auth/session";
 import { BackendApiError } from "@/lib/api/server";
-import { productApi } from "./product-api";
+import { productApi } from "../api/product-api";
 
 import type {
   CreateProductActionResult,
   CreateProductOptionPayload,
   CreateProductPayload,
-} from "./types";
+} from "../types/types";
 
 const guidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

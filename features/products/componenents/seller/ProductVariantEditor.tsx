@@ -8,9 +8,9 @@ import {
 } from "react";
 
 import Button from "@/components/ui/Button";
-import ProductIcon from "./ProductIcon";
-import { updateProductVariantAction } from "./variant-actions";
-import type { ProductVariant } from "./types";
+import ProductIcon from "../shared/ProductIcon";
+import { updateProductVariantAction } from "../../actions/variant-actions";
+import type { ProductVariant } from "../../types/types";
 
 type ProductVariantEditorProps = {
   productId: string;

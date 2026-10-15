@@ -9,6 +9,13 @@ import { authApi, AuthApiError } from "./auth-api";
 import { useRouter } from "next/navigation";
 import type { AuthResponse } from "./auth-api";
 import useOtpCooldown from "./useOtpCooldown";
+import PasswordRequirements from "./components/PasswordRequirements";
+
+import {
+  getPasswordValidation,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_BYTES,
+} from "./password-rules";
 
 type View = 'LOGIN' | 'REGISTER' | 'OTP';
 type Message = { text: string; error: boolean };
@@ -34,6 +41,7 @@ export default function AuthPage() {
 
   const { remainingSeconds, startCooldown } = useOtpCooldown();
   const loading = submitting || resending;
+  const passwordValidation = getPasswordValidation(password);
 
   function switchView(next: View) {
     if (loading) return;
@@ -125,6 +133,18 @@ export default function AuthPage() {
 
     if (loading) return;
 
+    if (view === "REGISTER" && !passwordValidation.valid) {
+      setMessage({
+        text: passwordValidation.withinByteLimit
+          ? "Lengkapi persyaratan password sebelum membuat akun."
+          : `Password maksimal ${PASSWORD_MAX_BYTES} byte UTF-8.`,
+        error: true,
+      });
+
+      document.getElementById("password")?.focus();
+      return;
+    }
+
     setSubmitting(true);
     setMessage(null);
 
@@ -212,14 +232,44 @@ export default function AuthPage() {
             <p className="mt-3 text-sm leading-6 text-muted">{copy[view].subtitle}</p>
             {view === 'OTP' && <p className="mt-2 break-all text-sm font-semibold text-foreground">{email}</p>}
 
-            {view !== 'OTP' && (
-              <div aria-label="Pilih form akun" className="mt-7 grid grid-cols-2 gap-1 rounded-xl bg-background p-1">
-                {([{ key: 'LOGIN', label: 'Masuk' }, { key: 'REGISTER', label: 'Daftar' }] as const).map(item => (
-                  <button key={item.key} type="button" aria-pressed={view === item.key} disabled={loading} onClick={() => switchView(item.key)}
-                    className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60 ${view === item.key ? 'bg-surface text-primary shadow-sm' : 'text-muted hover:bg-surface/70 hover:text-foreground'}`}>
-                    {item.label}
-                  </button>
-                ))}
+            {view !== "OTP" && (
+              <div
+                role="group"
+                aria-label="Pilih form akun"
+                className="mt-7 border-b border-border"
+              >
+                <div className="relative grid grid-cols-2">
+                  {(
+                    [
+                      { key: "LOGIN", label: "Masuk" },
+                      { key: "REGISTER", label: "Daftar" },
+                    ] as const
+                  ).map((item) => {
+                    const active = view === item.key;
+
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        aria-pressed={active}
+                        disabled={loading}
+                        onClick={() => switchView(item.key)}
+                        className={`relative min-h-12 px-4 pb-4 pt-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none ${active
+                            ? "text-primary"
+                            : "text-muted hover:text-foreground"
+                          }`}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  })}
+
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute bottom-0 left-0 h-0.5 w-1/2 rounded-full bg-primary transition-transform duration-200 ease-out motion-reduce:transition-none ${view === "REGISTER" ? "translate-x-full" : ""
+                      }`}
+                  />
+                </div>
               </div>
             )}
 
@@ -233,22 +283,59 @@ export default function AuthPage() {
               <fieldset disabled={loading} className="space-y-5">
                 <legend className="sr-only">{copy[view].title}</legend>
                 {view === 'REGISTER' && <FormField id="full-name" label="Nama lengkap" minLength={2}
-maxLength={100} autoComplete="name" required value={fullName}
+                  maxLength={100} autoComplete="name" required value={fullName}
                   onChange={event => setFullName(event.target.value)} placeholder="Nama lengkap kamu" pattern=".*\S.*" />}
                 {view !== 'OTP' && <FormField id="email" label="Email" maxLength={254} type="email" autoComplete="email" required value={email}
                   onChange={event => setEmail(event.target.value)} placeholder="nama@contoh.com" />}
-                {view !== 'OTP' && (
-                  <FormField id="password" label="Password" minLength={view === "REGISTER" ? 15 : undefined}
-maxLength={view === "REGISTER" ? 72 : undefined} type={showPassword ? 'text' : 'password'}
-                    autoComplete={view === 'LOGIN' ? 'current-password' : 'new-password'} required value={password}
-                    onChange={event => setPassword(event.target.value)}
-                    placeholder={view === 'LOGIN' ? 'Masukkan password' : 'Buat password'}
-                    endAdornment={
-                      <button type="button" aria-controls="password" aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}
-                        className="rounded-lg px-2 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover">
-                        {showPassword ? 'Sembunyikan' : 'Tampilkan'}<span className="sr-only"> password</span>
-                      </button>
-                    } />
+                {view !== "OTP" && (
+                  <div>
+                    <FormField
+                      id="password"
+                      label="Password"
+                      minLength={
+                        view === "REGISTER" ? PASSWORD_MIN_LENGTH : undefined
+                      }
+                      maxLength={
+                        view === "REGISTER" ? PASSWORD_MAX_BYTES : undefined
+                      }
+                      type={showPassword ? "text" : "password"}
+                      autoComplete={
+                        view === "LOGIN" ? "current-password" : "new-password"
+                      }
+                      required
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder={
+                        view === "LOGIN"
+                          ? "Masukkan password"
+                          : "Buat password"
+                      }
+                      aria-describedby={
+                        view === "REGISTER"
+                          ? "password-requirements"
+                          : undefined
+                      }
+                      endAdornment={
+                        <button
+                          type="button"
+                          aria-controls="password"
+                          aria-pressed={showPassword}
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="rounded-lg px-2 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover"
+                        >
+                          {showPassword ? "Sembunyikan" : "Tampilkan"}
+                          <span className="sr-only"> password</span>
+                        </button>
+                      }
+                    />
+
+                    {view === "REGISTER" && (
+                      <PasswordRequirements
+                        validation={passwordValidation}
+                        started={password.length > 0}
+                      />
+                    )}
+                  </div>
                 )}
                 {view === 'REGISTER' && (
                   <div>
@@ -267,6 +354,7 @@ maxLength={view === "REGISTER" ? 72 : undefined} type={showPassword ? 'text' : '
                 <Button type="submit" loading={submitting}
                   disabled={
                     loading ||
+                    (view === "REGISTER" && !passwordValidation.valid) ||
                     (view === "OTP" && !/^\d{6}$/.test(otpCode))
                   } className="w-full">
                   {view === 'LOGIN' ? 'Masuk ke akun' : view === 'REGISTER' ? 'Buat akun' : 'Verifikasi email'}

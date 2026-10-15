@@ -6,9 +6,9 @@ import { requireRole } from "@/lib/auth/guards";
 import { BackendApiError } from "@/lib/api/server";
 import LogoutButton from "@/features/auth/LogoutButton";
 import { storeApi } from "@/features/stores/store-api";
-import { productApi } from "@/features/products/product-api";
-import SellerProductCard from "@/features/products/SellerProductCard";
-import ProductIcon from "@/features/products/ProductIcon";
+import { productApi } from "@/features/products/api/product-api";
+import SellerProductCard from "@/features/products/componenents/seller/SellerProductCard";
+import ProductIcon from "@/features/products/componenents/shared/ProductIcon";
 
 export const metadata: Metadata = {
   title: "Produk Toko | NAVYCommerce",

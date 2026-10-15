@@ -9,6 +9,7 @@ export class BackendApiError extends Error {
     public readonly status: number,
     public readonly code?: string,
     public readonly fieldErrors: Record<string, string[]> = {},
+    public readonly issues: BackendApiIssue[] = [],
   ) {
     super(message);
     this.name = "BackendApiError";
@@ -16,6 +17,11 @@ export class BackendApiError extends Error {
 }
 
 type BackendMethod = "GET" | "POST" | "PUT" | "DELETE";
+
+export type BackendApiIssue = {
+  code: string;
+  message: string;
+};
 
 async function backendRequest<T>(
   path: string,
@@ -102,6 +108,26 @@ async function backendRequest<T>(
       }
     }
 
+    const issues: BackendApiIssue[] = [];
+
+    if (Array.isArray(data.issues)) {
+      for (const item of data.issues) {
+        if (item && typeof item === "object" && !Array.isArray(item)) {
+          const issue = item as Record<string, unknown>;
+
+          if (
+            typeof issue.code === "string" &&
+            typeof issue.message === "string"
+          ) {
+            issues.push({
+              code: issue.code,
+              message: issue.message,
+            });
+          }
+        }
+      }
+    }
+
     const fallback =
       response.status === 401
         ? "Session tidak diterima backend. Silakan login kembali."
@@ -122,6 +148,7 @@ async function backendRequest<T>(
       response.status,
       typeof data.code === "string" ? data.code : undefined,
       fieldErrors,
+      issues,
     );
   }
 

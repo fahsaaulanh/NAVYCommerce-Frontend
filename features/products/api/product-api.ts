@@ -14,7 +14,8 @@ import type {
   SellerProductListResponse,
   CreateProductPayload,
   CreateProductResponse,
-} from "./types";
+  ProductPublicationResponse,
+} from "../types/types";
 
 export const productApi = {
   getOwnedById(productId: string) {
@@ -111,6 +112,27 @@ export const productApi = {
 
     return backendGet<SellerProductListResponse>(
       `/Products/mine/store/${id}?${query.toString()}`,
+    );
+  },
+
+  setPublication(productId: string, isActive: boolean) {
+    return backendPut<ProductPublicationResponse>(
+      `/Products/${encodeURIComponent(productId)}/publication`,
+      { isActive },
+    );
+  },
+
+  renameOption(productId: string, optionId: string, name: string) {
+    return backendPut<{ code: string; message: string }>(
+      `/Products/${encodeURIComponent(productId)}/options/${encodeURIComponent(optionId)}/name`,
+      { name },
+    );
+  },
+
+  renameOptionValue(productId: string, optionValueId: string, value: string) {
+    return backendPut<{ code: string; message: string }>(
+      `/Products/${encodeURIComponent(productId)}/option-values/${encodeURIComponent(optionValueId)}/value`,
+      { value },
     );
   },
 };

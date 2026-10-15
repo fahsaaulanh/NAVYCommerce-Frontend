@@ -2,7 +2,7 @@
 
 import { getSession } from "@/lib/auth/session";
 import { BackendApiError } from "@/lib/api/server";
-import { productApi } from "./product-api";
+import { productApi } from "../api/product-api";
 
 type UpdateVariantResult =
   | { ok: true; message: string }

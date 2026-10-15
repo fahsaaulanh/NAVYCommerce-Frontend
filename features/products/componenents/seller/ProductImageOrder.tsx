@@ -4,9 +4,9 @@ import Image from "next/image";
 import { useId, useRef, useState } from "react";
 
 import Button from "@/components/ui/Button";
-import ProductIcon from "./ProductIcon";
-import { reorderProductImagesAction } from "./image-actions";
-import type { ProductImage } from "./types";
+import ProductIcon from "../shared/ProductIcon";
+import { reorderProductImagesAction } from "../../actions/image-actions";
+import type { ProductImage } from "../../types/types";
 
 type ProductImageOrderProps = {
   productId: string;

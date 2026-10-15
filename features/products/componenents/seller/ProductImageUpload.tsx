@@ -11,14 +11,14 @@ import {
 } from "react";
 
 import Button from "@/components/ui/Button";
-import ProductIcon from "./ProductIcon";
-import { uploadProductImageAction } from "./image-actions";
+import ProductIcon from "../shared/ProductIcon";
+import { uploadProductImageAction } from "../../actions/image-actions";
 import {
   MAX_IMAGE_ALT_TEXT,
   MAX_PRODUCT_IMAGES,
   validateImageFile,
-} from "./image-rules";
-import type { ProductImage } from "./types";
+} from "../../utils/image-rules";
+import type { ProductImage } from "../../types/types";
 
 type ProductImageUploadProps = {
   productId: string;

@@ -1,4 +1,15 @@
-type IconName = "plus" | "arrow-right" | "arrow-left" | "logout" | "store";
+type IconName =
+  | "plus"
+  | "arrow-right"
+  | "arrow-left"
+  | "logout"
+  | "store"
+  | "search"
+  | "filter"
+  | "close"
+  | "grid"
+  | "user"
+  | "box";
 
 type IconProps = {
   name: IconName;
@@ -6,6 +17,12 @@ type IconProps = {
 };
 
 const paths: Record<IconName, string> = {
+  search: "M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0",
+  filter: "M4 7h16M7 12h10M10 17h4",
+  close: "m6 6 12 12M18 6 6 18",
+  grid: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
+  user: "M20 21v-2a7 7 0 0 0-14 0v2M17 7A5 5 0 1 1 7 7a5 5 0 0 1 10 0",
+  box: "m12 3 9 5-9 5-9-5 9-5ZM3 8v9l9 5 9-5V8M12 13v9",
   plus: "M12 5v14M5 12h14",
   "arrow-right": "M5 12h14m-6-6 6 6-6 6",
   "arrow-left": "M19 12H5m6-6-6 6 6 6",

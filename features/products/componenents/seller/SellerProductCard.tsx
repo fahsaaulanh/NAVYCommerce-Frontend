@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-import ProductIcon from "./ProductIcon";
-import type { SellerProductSummary } from "./types";
+import ProductIcon from "../shared/ProductIcon";
+import type { SellerProductSummary } from "../../types/types";
 
 const currency = new Intl.NumberFormat("id-ID", {
   style: "currency",

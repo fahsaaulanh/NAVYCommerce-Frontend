@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import type { Category } from "@/features/categories/types";
 
-import { createProductAction } from "./create-product-action";
+import { createProductAction } from "../../actions/create-product-action";
 
 type CreateProductFormProps = {
   storeId: string;

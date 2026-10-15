@@ -141,3 +141,29 @@ export type CreateProductActionResult =
       message: string;
       fieldErrors: Record<string, string[]>;
     };
+
+export type ProductPublicationIssue = {
+  code: string;
+  message: string;
+};
+
+export type ProductPublicationResponse = {
+  code: string;
+  message: string;
+  data: {
+    id: string;
+    isActive: boolean;
+  };
+};
+
+export type ProductPublicationActionResult =
+  | {
+      ok: true;
+      message: string;
+      isActive: boolean;
+    }
+  | {
+      ok: false;
+      message: string;
+      issues: ProductPublicationIssue[];
+    };

@@ -2,14 +2,14 @@
 
 import { getSession } from "@/lib/auth/session";
 import { BackendApiError } from "@/lib/api/server";
-import { productApi } from "./product-api";
+import { productApi } from "../api/product-api";
 import {
   MAX_IMAGE_ALT_TEXT,
   MAX_PRODUCT_IMAGES,
   validateImageFile,
-} from "./image-rules";
-import type { UploadProductImageResult } from "./types";
-import type { ProductImageMutationResult } from "./types";
+} from "../utils/image-rules";
+import type { UploadProductImageResult } from "../types/types";
+import type { ProductImageMutationResult } from "../types/types";
 
 const guidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

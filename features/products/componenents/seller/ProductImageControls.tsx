@@ -8,13 +8,13 @@ import {
 } from "react";
 
 import Button from "@/components/ui/Button";
-import ProductIcon from "./ProductIcon";
+import ProductIcon from "../shared/ProductIcon";
 import {
   deleteProductImageAction,
   updateProductImageAltTextAction,
-} from "./image-actions";
-import { MAX_IMAGE_ALT_TEXT } from "./image-rules";
-import type { ProductImage } from "./types";
+} from "../../actions/image-actions";
+import { MAX_IMAGE_ALT_TEXT } from "../../utils/image-rules";
+import type { ProductImage } from "../../types/types";
 
 type ProductImageControlsProps = {
   productId: string;

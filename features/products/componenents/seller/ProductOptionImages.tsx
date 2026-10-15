@@ -9,13 +9,13 @@ import {
 } from "react";
 
 import Button from "@/components/ui/Button";
-import ProductIcon from "./ProductIcon";
-import { setProductOptionImageAction } from "./image-actions";
+import ProductIcon from "../shared/ProductIcon";
+import { setProductOptionImageAction } from "../../actions/image-actions";
 import type {
   ProductImage,
   ProductOption,
   ProductOptionValue,
-} from "./types";
+} from "../../types/types";
 
 type ProductOptionImagesProps = {
   productId: string;

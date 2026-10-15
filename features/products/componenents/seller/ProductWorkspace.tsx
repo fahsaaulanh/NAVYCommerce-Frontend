@@ -6,17 +6,19 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import Button from "@/components/ui/Button";
-import ProductIcon from "./ProductIcon";
+import ProductIcon from "../shared/ProductIcon";
 import type {
   ProductDetail,
   ProductImage,
   ProductOptionValue,
-} from "./types";
+} from "../../types/types";
 import ProductImageUpload from "./ProductImageUpload";
 import ProductImageControls from "./ProductImageControls";
 import ProductImageOrder from "./ProductImageOrder";
 import ProductOptionImages from "./ProductOptionImages";
 import ProductVariantEditor from "./ProductVariantEditor";
+import ProductPublicationPanel from "./ProductPublicationPanel";
+import ProductOptionEditor from "./ProductOptionEditor";
 
 type ProductWorkspaceProps = {
   product: ProductDetail;
@@ -300,6 +302,12 @@ export default function ProductWorkspace({
         </nav>
       </header>
 
+      <ProductPublicationPanel
+        product={product}
+        images={images}
+        galleryError={galleryError}
+      />
+
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
           <div
@@ -339,13 +347,13 @@ export default function ProductWorkspace({
 
       <div
         id="product-gallery"
-        className="grid scroll-mt-6 items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]"
+        className="grid scroll-mt-6 gap-6 xl:h-[860px] xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] xl:grid-rows-[minmax(0,1fr)]"
       >
         <section
           aria-labelledby="gallery-heading"
-          className="min-w-0 rounded-3xl border border-border bg-surface p-5 sm:p-6"
+          className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-3xl border border-border bg-surface p-5 sm:p-6"
         >
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex shrink-0 items-center justify-between gap-3">
             <div>
               <h2
                 id="gallery-heading"
@@ -367,7 +375,7 @@ export default function ProductWorkspace({
             )}
           </div>
 
-          <div className="relative mt-5 flex aspect-[4/3] max-h-[420px] items-center justify-center overflow-hidden rounded-2xl border border-border bg-background">
+          <div className="relative mt-5 flex aspect-[4/3] max-h-[420px] items-center justify-center overflow-hidden rounded-2xl border border-border bg-background xl:min-h-0 xl:flex-1 xl:aspect-auto xl:max-h-none">
             {galleryError ? (
               <div className="max-w-sm px-6 text-center">
                 <ProductIcon
@@ -447,13 +455,14 @@ export default function ProductWorkspace({
           {gallery.length > 0 && (
             <ul
               aria-label="Thumbnail gambar produk"
-              className="mt-4 flex gap-3 overflow-x-auto pb-2"
+              className="mt-4 flex shrink-0 gap-3 overflow-x-auto pb-2"
             >
               {gallery.map((image, index) => (
                 <li key={image.id} className="shrink-0">
                   <button
                     type="button"
-                    aria-label={`Tampilkan gambar ${index + 1}: ${image.altText || product.title}`}
+                    aria-label={`Tampilkan gambar ${index + 1}: ${image.altText || product.title
+                      }`}
                     aria-pressed={image.id === activeImage?.id}
                     onClick={() => setSelectedImageId(image.id)}
                     className={[
@@ -484,77 +493,115 @@ export default function ProductWorkspace({
           )}
 
           {activeImage && !galleryError && (
-            <ProductImageControls
-              key={`${activeImage.id}:${activeImage.altText}`}
-              productId={product.id}
-              image={activeImage}
-              disabled={refreshing}
-              usedBy={options.flatMap((option) =>
-                option.values
-                  .filter((value) => value.imageId === activeImage.id)
-                  .map((value) => `${option.name}: ${value.value}`),
-              )}
-              onUpdated={(message) => {
-                setGalleryNotice(message);
-                refresh();
-              }}
-              onDeleted={(message) => {
-                setGalleryNotice(message);
-                setSelectedImageId(null);
-                document.getElementById("gallery-heading")?.focus();
-                refresh();
-              }}
-            />
+            <div
+              role="region"
+              aria-label="Pengaturan gambar terpilih"
+              tabIndex={0}
+              className="mt-4 shrink-0 overflow-y-auto overscroll-contain rounded-2xl xl:max-h-[180px]"
+            >
+              <ProductImageControls
+                key={`${activeImage.id}:${activeImage.altText}`}
+                productId={product.id}
+                image={activeImage}
+                disabled={refreshing}
+                usedBy={options.flatMap((option) =>
+                  option.values
+                    .filter((value) => value.imageId === activeImage.id)
+                    .map((value) => `${option.name}: ${value.value}`),
+                )}
+                onUpdated={(message) => {
+                  setGalleryNotice(message);
+                  refresh();
+                }}
+                onDeleted={(message) => {
+                  setGalleryNotice(message);
+                  setSelectedImageId(null);
+                  document.getElementById("gallery-heading")?.focus();
+                  refresh();
+                }}
+              />
+            </div>
           )}
         </section>
 
-        <div className="min-w-0 space-y-6">
-          <section className="rounded-3xl border border-border bg-surface p-6">
-            <h2 className="text-lg font-semibold text-foreground">
+        <div className="grid min-h-0 min-w-0 gap-6 xl:grid-rows-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <section
+            aria-labelledby="product-information-heading"
+            className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-3xl border border-border bg-surface p-6"
+          >
+            <h2
+              id="product-information-heading"
+              className="shrink-0 text-lg font-semibold text-foreground"
+            >
               Informasi produk
             </h2>
 
-            <dl className="mt-5 grid grid-cols-2 gap-5">
-              <div>
+            <dl className="mt-5 grid shrink-0 grid-cols-2 gap-5">
+              <div className="min-w-0">
                 <dt className="text-xs text-muted">Harga dasar</dt>
-                <dd className="mt-2 text-xl font-semibold text-primary">
+
+                <dd className="mt-2 break-words text-xl font-semibold text-primary">
                   {currency.format(product.basePrice)}
                 </dd>
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <dt className="text-xs text-muted">Berat produk</dt>
-                <dd className="mt-2 font-semibold text-foreground">
+
+                <dd className="mt-2 break-words font-semibold text-foreground">
                   {number.format(product.weightGrams)} gram
                 </dd>
               </div>
             </dl>
 
-            <div className="mt-6 border-t border-border pt-5">
-              <h3 className="text-sm font-semibold text-foreground">
+            <div className="mt-6 flex min-h-0 flex-1 flex-col border-t border-border pt-5">
+              <h3
+                id="product-description-heading"
+                className="shrink-0 text-sm font-semibold text-foreground"
+              >
                 Deskripsi
               </h3>
 
-              <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-muted">
-                {product.description?.trim() ||
-                  "Belum ada deskripsi produk."}
-              </p>
+              <div
+                role="region"
+                aria-labelledby="product-description-heading"
+                tabIndex={0}
+                className="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-lg pr-3"
+              >
+                <p className="whitespace-pre-wrap break-words text-sm leading-7 text-muted [overflow-wrap:anywhere]">
+                  {product.description?.trim() ||
+                    "Belum ada deskripsi produk."}
+                </p>
+              </div>
             </div>
           </section>
 
-          <section className="rounded-3xl border border-border bg-surface p-6">
-            <h2 className="text-lg font-semibold text-foreground">
-              Preview pilihan varian
-            </h2>
+          <section
+            aria-labelledby="variant-preview-heading"
+            className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-3xl border border-border bg-surface p-6"
+          >
+            <div className="shrink-0">
+              <h2
+                id="variant-preview-heading"
+                className="text-lg font-semibold text-foreground"
+              >
+                Preview pilihan varian
+              </h2>
 
-            <p className="mt-2 text-sm leading-6 text-muted">
-              Pilih kombinasi untuk melihat harga dan stoknya.
-            </p>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                Pilih kombinasi untuk melihat harga dan stoknya.
+              </p>
+            </div>
 
-            <div className="mt-5 space-y-5">
+            <div
+              role="region"
+              aria-label="Pilihan varian produk"
+              tabIndex={0}
+              className="mt-5 min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain rounded-lg pr-3"
+            >
               {options.map((option) => (
-                <fieldset key={option.id}>
-                  <legend className="text-sm font-semibold text-foreground">
+                <fieldset key={option.id} className="min-w-0">
+                  <legend className="max-w-full break-words text-sm font-semibold text-foreground">
                     {option.name}
                   </legend>
 
@@ -570,17 +617,20 @@ export default function ProductWorkspace({
                           aria-pressed={selected}
                           onClick={() => selectOption(option.id, value)}
                           className={[
-                            "inline-flex min-h-10 items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-colors",
+                            "inline-flex min-h-10 max-w-full items-center gap-2 rounded-xl border px-4 py-2 text-left text-sm font-medium transition-colors",
                             selected
                               ? "border-primary bg-primary/10 text-primary"
                               : "border-border bg-surface text-foreground hover:border-primary/50 hover:bg-background",
                           ].join(" ")}
                         >
-                          {value.value}
+                          <span className="min-w-0 break-words [overflow-wrap:anywhere]">
+                            {value.value}
+                          </span>
+
                           {selected && (
                             <ProductIcon
                               name="check"
-                              className="size-4"
+                              className="size-4 shrink-0"
                             />
                           )}
                         </button>
@@ -599,15 +649,16 @@ export default function ProductWorkspace({
 
             <div
               aria-live="polite"
-              className="mt-6 rounded-2xl border border-border bg-background p-4"
+              className="mt-5 flex min-h-[104px] shrink-0 items-center rounded-2xl border border-border bg-background p-4"
             >
               {selectedVariant ? (
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
+                <div className="flex w-full flex-wrap items-center justify-between gap-3">
+                  <div className="min-w-0">
                     <p className="text-xs text-muted">
                       Harga kombinasi
                     </p>
-                    <p className="mt-1 text-xl font-semibold text-foreground">
+
+                    <p className="mt-1 break-words text-xl font-semibold text-foreground">
                       {currency.format(selectedVariant.price)}
                     </p>
                   </div>
@@ -624,7 +675,7 @@ export default function ProductWorkspace({
                   </span>
                 </div>
               ) : (
-                <p className="text-sm text-muted">
+                <p className="text-sm leading-6 text-muted">
                   Pilih seluruh opsi untuk melihat kombinasi varian.
                 </p>
               )}
@@ -730,21 +781,28 @@ export default function ProductWorkspace({
       </section>
 
       {!galleryError && (
-        <ProductOptionImages
-          productId={product.id}
-          options={options}
-          images={gallery}
-          disabled={refreshing}
-          onSaved={(imageId, message) => {
-            setGalleryNotice(message);
+        <>
+          <ProductOptionEditor
+            productId={product.id}
+            options={product.options}
+          />
 
-            if (imageId) {
-              setSelectedImageId(imageId);
-            }
+          <ProductOptionImages
+            productId={product.id}
+            options={options}
+            images={gallery}
+            disabled={refreshing}
+            onSaved={(imageId, message) => {
+              setGalleryNotice(message);
 
-            refresh();
-          }}
-        />
+              if (imageId) {
+                setSelectedImageId(imageId);
+              }
+
+              refresh();
+            }}
+          />
+        </>
       )}
 
       <section
