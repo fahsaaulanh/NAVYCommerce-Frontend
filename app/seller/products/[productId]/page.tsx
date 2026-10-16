@@ -6,7 +6,7 @@ import { requireRole } from "@/lib/auth/guards";
 import { BackendApiError } from "@/lib/api/server";
 import LogoutButton from "@/features/auth/LogoutButton";
 import { productApi } from "@/features/products/api/product-api";
-import ProductWorkspace from "@/features/products/componenents/seller/ProductWorkspace";
+import ProductWorkspace from "@/features/products/components/seller/ProductWorkspace";
 
 export const metadata: Metadata = {
   title: "Detail Produk | NAVYCommerce",

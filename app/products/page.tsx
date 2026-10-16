@@ -14,10 +14,10 @@ import {
   paginationItems,
   type CatalogSearchParams,
 } from "@/features/products/utils/catalog-query";
-import PublicProductCard from "@/features/products/componenents/catalog/PublicProductCard";
-import CatalogFilters from "@/features/products/componenents/catalog/CatalogFilters";
-import CatalogToolbar from "@/features/products/componenents/catalog/CatalogToolbar";
-import styles from "@/features/products/componenents/catalog/catalog.module.css";
+import PublicProductCard from "@/features/products/components/catalog/PublicProductCard";
+import CatalogFilters from "@/features/products/components/catalog/CatalogFilters";
+import CatalogToolbar from "@/features/products/components/catalog/CatalogToolbar";
+import styles from "@/features/products/components/catalog/catalog.module.css";
 export const metadata: Metadata = {
   title: "Belanja Produk | NAVYCommerce",
   description:

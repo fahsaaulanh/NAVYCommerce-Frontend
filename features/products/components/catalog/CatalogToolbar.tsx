@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/ui/Icon";
 import { formatNumber } from "@/lib/format";
-import type { CatalogCategory } from "../../../../../frontend/features/products/types/public-types";
+import type { CatalogCategory } from "@/features/products/types/public-types";
 import {
   CATALOG_SORTS,
   catalogHref,

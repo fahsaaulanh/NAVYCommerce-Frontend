@@ -9,7 +9,7 @@ import LogoutButton from "@/features/auth/LogoutButton";
 import { categoryApi } from "@/features/categories/category-api";
 import type { CategoryListResponse } from "@/features/categories/types";
 
-import CreateProductForm from "@/features/products/componenents/seller/CreateProductForm";
+import CreateProductForm from "@/features/products/components/seller/CreateProductForm";
 import { storeApi } from "@/features/stores/store-api";
 import type { StoreDetailResponse } from "@/features/stores/types";
 

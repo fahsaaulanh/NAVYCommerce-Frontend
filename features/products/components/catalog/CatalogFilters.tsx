@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useId, useState, type FormEvent } from "react";
 import Button from "@/components/ui/Button";
-import type { CatalogCategory } from "../../../../../frontend/features/products/types/public-types";
+import type { CatalogCategory } from "@/features/products/types/public-types";
 import type { CatalogQuery } from "../../utils/catalog-query";
 import { catalogHref } from "../../utils/catalog-query";
 import { formatNumber } from "@/lib/format";

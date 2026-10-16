@@ -7,8 +7,8 @@ import { BackendApiError } from "@/lib/api/server";
 import LogoutButton from "@/features/auth/LogoutButton";
 import { storeApi } from "@/features/stores/store-api";
 import { productApi } from "@/features/products/api/product-api";
-import SellerProductCard from "@/features/products/componenents/seller/SellerProductCard";
-import ProductIcon from "@/features/products/componenents/shared/ProductIcon";
+import SellerProductCard from "@/features/products/components/seller/SellerProductCard";
+import ProductIcon from "@/features/products/components/shared/ProductIcon";
 
 export const metadata: Metadata = {
   title: "Produk Toko | NAVYCommerce",

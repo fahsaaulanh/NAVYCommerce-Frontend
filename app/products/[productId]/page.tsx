@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { BackendApiError } from "@/lib/api/server";
 import { catalogApi } from "@/features/products/api/catalog-api";
-import PublicProductDetail from "@/features/products/componenents/catalog/PublicProductDetail";
+import PublicProductDetail from "@/features/products/components/catalog/PublicProductDetail";
 import type { PublicProductDetailResponse } from "@/features/products/types/public-types";
 
 export const metadata: Metadata = {

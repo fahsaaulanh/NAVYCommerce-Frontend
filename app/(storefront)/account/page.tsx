@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { requireUser } from "@/lib/auth/guards";
+import Icon from "@/components/ui/Icon";
 import LogoutButton from "@/features/auth/LogoutButton";
 
 export const metadata: Metadata = {
@@ -79,6 +80,18 @@ export default async function AccountPage() {
             </div>
           ))}
         </dl>
+
+        {user.role === "Customer" && (
+          <div className="border-t border-border p-6 sm:px-8">
+            <Link href="/account/addresses" className="group flex items-center justify-between gap-4 rounded-2xl border border-border p-4 transition-colors hover:border-primary/40 hover:bg-primary/5">
+              <span>
+                <span className="block text-sm font-semibold text-foreground">Alamat pengiriman</span>
+                <span className="mt-1 block text-sm text-muted">Tambah alamat dan pilih tujuan pengiriman utama.</span>
+              </span>
+              <span className="text-primary transition-transform group-hover:translate-x-1"><Icon name="arrow-right" /></span>
+            </Link>
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border bg-background/50 p-6 sm:px-8">
           {user.role === "Seller" && (

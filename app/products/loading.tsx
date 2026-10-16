@@ -1,4 +1,4 @@
-import styles from "@/features/products/componenents/catalog/catalog.module.css";
+import styles from "@/features/products/components/catalog/catalog.module.css";
 export default function ProductsLoading() {
   return (
     <section
