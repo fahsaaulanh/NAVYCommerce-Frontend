@@ -65,7 +65,6 @@ async function verifyToken(token: string) {
       expiresAt: new Date(payload.exp * 1000),
     };
   } catch {
-    // Token tidak valid atau sudah kedaluwarsa.
     return null;
   }
 }

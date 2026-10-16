@@ -1,9 +1,12 @@
 import "server-only";
 
 import { backendGet, backendPost, backendPut, backendDelete } from "@/lib/api/server";
-import type { CartResponse, CartMutationResponse } from "../types/cart";
+import type { CartResponse, CartMutationResponse, CartSummaryResponse } from "../types/cart";
 
 export const cartApi = {
+  getSummary() {
+    return backendGet<CartSummaryResponse>("/Carts/summary");
+  },
   getMine() {
     return backendGet<CartResponse>("/Carts/mine");
   },

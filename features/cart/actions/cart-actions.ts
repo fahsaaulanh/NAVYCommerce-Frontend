@@ -7,13 +7,22 @@ import { cartApi } from "../api/cart-api";
 import { isCartId, isCartQuantity } from "../utils/validation";
 import type { CartActionResult, CartMutationResponse } from "../types/cart";
 
-async function mutate(operation: () => Promise<CartMutationResponse>): Promise<CartActionResult> {
+async function mutate(
+  operation: () => Promise<CartMutationResponse>,
+): Promise<CartActionResult> {
   const user = await getSession();
   if (!user) {
-    return { ok: false, authRequired: true, message: "Masuk sebagai Customer untuk menggunakan keranjang." };
+    return {
+      ok: false,
+      authRequired: true,
+      message: "Masuk sebagai Customer untuk menggunakan keranjang.",
+    };
   }
   if (user.role !== "Customer") {
-    return { ok: false, message: "Keranjang belanja tersedia untuk akun Customer." };
+    return {
+      ok: false,
+      message: "Keranjang belanja tersedia untuk akun Customer.",
+    };
   }
 
   let result: CartActionResult;
@@ -23,29 +32,46 @@ async function mutate(operation: () => Promise<CartMutationResponse>): Promise<C
   } catch (error) {
     if (!(error instanceof BackendApiError)) throw error;
     if (error.status === 401) await deleteSession();
-    result = { ok: false, message: error.message, authRequired: error.status === 401 };
+    result = {
+      ok: false,
+      message: error.message,
+      authRequired: error.status === 401,
+    };
   }
 
-  // Baca ulang keadaan server, termasuk jika respons suatu perubahan terputus.
-  revalidatePath("/cart");
+  revalidatePath("/cart", "layout");
+  revalidatePath("/products", "layout");
+  revalidatePath("/(storefront)", "layout");
   return result;
 }
 
-export async function addCartItemAction(productVariantId: unknown, quantity: unknown): Promise<CartActionResult> {
+export async function addCartItemAction(
+  productVariantId: unknown,
+  quantity: unknown,
+): Promise<CartActionResult> {
   if (!isCartId(productVariantId) || !isCartQuantity(quantity)) {
     return { ok: false, message: "Pilih varian dan jumlah produk yang valid." };
   }
   return mutate(() => cartApi.addItem(productVariantId, quantity));
 }
 
-export async function updateCartItemAction(itemId: unknown, quantity: unknown): Promise<CartActionResult> {
+export async function updateCartItemAction(
+  itemId: unknown,
+  quantity: unknown,
+): Promise<CartActionResult> {
   if (!isCartId(itemId) || !isCartQuantity(quantity)) {
-    return { ok: false, message: "Jumlah produk harus berupa bilangan bulat lebih dari 0." };
+    return {
+      ok: false,
+      message: "Jumlah produk harus berupa bilangan bulat lebih dari 0.",
+    };
   }
   return mutate(() => cartApi.updateQuantity(itemId, quantity));
 }
 
-export async function removeCartItemAction(itemId: unknown): Promise<CartActionResult> {
-  if (!isCartId(itemId)) return { ok: false, message: "Item keranjang tidak valid." };
+export async function removeCartItemAction(
+  itemId: unknown,
+): Promise<CartActionResult> {
+  if (!isCartId(itemId))
+    return { ok: false, message: "Item keranjang tidak valid." };
   return mutate(() => cartApi.removeItem(itemId));
 }

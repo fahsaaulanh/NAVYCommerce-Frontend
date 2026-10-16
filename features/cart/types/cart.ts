@@ -25,6 +25,9 @@ export type Cart = {
   subtotal: number;
 };
 
+export type CartSummaryResponse = {
+  data: Pick<Cart, "totalItems" | "totalQuantity">;
+};
 export type CartResponse = { data: Cart };
 export type CartMutationResponse = {
   code: string;

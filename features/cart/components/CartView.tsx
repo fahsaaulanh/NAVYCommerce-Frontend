@@ -63,33 +63,35 @@ export default function CartView({ cart }: { cart: Cart }) {
 
       {cart.items.length === 0 && feedback}
 
-      {cart.items.length === 0 ? <section className={styles.empty}>
-        <span className={styles.emptyIcon}><Icon name="cart" className="size-10" /></span>
-        <p className={styles.eyebrow}>MULAI DARI YANG KAMU SUKA</p><h2>Keranjangmu masih kosong</h2>
-        <p>Temukan produk pilihan dari berbagai toko dan tambahkan varian yang kamu inginkan.</p>
-        <Link href="/products" className="action-button action-button--primary"><Icon name="search" />Jelajahi produk</Link>
-      </section> : <div className={styles.layout}>
-        <div className={styles.itemsColumn} role="region" aria-label="Daftar barang dalam keranjang" tabIndex={0}>
-          {feedback}
-          <div className={styles.toolbar}><label><input type="checkbox" className={styles.checkbox} checked={allSelected} disabled={pending || available.length === 0} onChange={(event) => toggleItems(available, event.target.checked)} />Pilih semua <span>({available.length})</span></label>
-            <span>{selected.length} varian dipilih</span></div>
-          {[...groups].map(([storeId, group]) => {
-            const eligible = group.items.filter((item) => item.canCheckout);
-            return <section key={storeId} className={styles.storeGroup} aria-label={`Produk dari ${group.name}`}>
-              <header className={styles.storeHeader}>
-                <input type="checkbox" className={styles.checkbox} aria-label={`Pilih semua produk ${group.name}`} checked={eligible.length > 0 && eligible.every(isSelected)} disabled={pending || eligible.length === 0} onChange={(event) => toggleItems(eligible, event.target.checked)} />
-                <span className={styles.storeIcon}><Icon name="store" /></span><h2>{group.name}</h2><span className={styles.storeCount}>{group.items.length} varian</span>
-              </header>
-              {group.items.map((item) => <CartItemRow key={`${item.id}:${item.quantity}:${item.availableStock}`} item={item} selected={isSelected(item)} pending={pending}
-                onSelect={() => toggleItems([item], !isSelected(item))}
-                onUpdate={(value) => mutate(() => updateCartItemAction(item.id, value))}
-                onRemove={() => mutate(() => removeCartItemAction(item.id))} />)}
-            </section>;
-          })}
-          <p className={styles.footnote}>Menambahkan produk ke keranjang belum memesan stok. Harga dan ketersediaan dapat berubah.</p>
-        </div>
-        <CartSummary subtotal={subtotal} quantity={quantity} />
-      </div>}
+      {cart.items.length === 0 ?
+        <section className={styles.empty}>
+          <span className={styles.emptyIcon}><Icon name="cart" className="size-10" /></span>
+          <p className={styles.eyebrow}>MULAI DARI YANG KAMU SUKA</p><h2>Keranjangmu masih kosong</h2>
+          <p>Temukan produk pilihan dari berbagai toko dan tambahkan varian yang kamu inginkan.</p>
+          <Link href="/products" className="action-button action-button--primary"><Icon name="search" />Jelajahi produk</Link>
+        </section> :
+        <div className={styles.layout}>
+          <div className={styles.itemsColumn} role="region" aria-label="Daftar barang dalam keranjang" tabIndex={0}>
+            {feedback}
+            <div className={styles.toolbar}><label><input type="checkbox" className={styles.checkbox} checked={allSelected} disabled={pending || available.length === 0} onChange={(event) => toggleItems(available, event.target.checked)} />Pilih semua <span>({available.length})</span></label>
+              <span>{selected.length} varian dipilih</span></div>
+            {[...groups].map(([storeId, group]) => {
+              const eligible = group.items.filter((item) => item.canCheckout);
+              return <section key={storeId} className={styles.storeGroup} aria-label={`Produk dari ${group.name}`}>
+                <header className={styles.storeHeader}>
+                  <input type="checkbox" className={styles.checkbox} aria-label={`Pilih semua produk ${group.name}`} checked={eligible.length > 0 && eligible.every(isSelected)} disabled={pending || eligible.length === 0} onChange={(event) => toggleItems(eligible, event.target.checked)} />
+                  <span className={styles.storeIcon}><Icon name="store" /></span><h2>{group.name}</h2><span className={styles.storeCount}>{group.items.length} varian</span>
+                </header>
+                {group.items.map((item) => <CartItemRow key={`${item.id}:${item.quantity}:${item.availableStock}`} item={item} selected={isSelected(item)} pending={pending}
+                  onSelect={() => toggleItems([item], !isSelected(item))}
+                  onUpdate={(value) => mutate(() => updateCartItemAction(item.id, value))}
+                  onRemove={() => mutate(() => removeCartItemAction(item.id))} />)}
+              </section>;
+            })}
+            <p className={styles.footnote}>Menambahkan produk ke keranjang belum memesan stok. Harga dan ketersediaan dapat berubah.</p>
+          </div>
+          <CartSummary subtotal={subtotal} quantity={quantity} />
+        </div>}
     </div>
   );
 }

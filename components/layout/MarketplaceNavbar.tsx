@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import CartLink from "@/features/cart/components/CartLink";
 import Brand from "@/components/brand/Brand";
 import Icon from "@/components/ui/Icon";
 import LogoutButton from "@/features/auth/LogoutButton";
@@ -7,9 +8,8 @@ import type { SessionUser } from "@/lib/auth/session";
 import type { CatalogCategory } from "@/features/products/types/public-types";
 import CatalogSearch from "./CatalogSearch";
 import styles from "./marketplace.module.css";
-
-type Props = { user: SessionUser | null; categories: CatalogCategory[] };
-export default function MarketplaceNavbar({ user, categories }: Props) {
+type Props = { user: SessionUser | null; categories: CatalogCategory[]; cartQuantity: number | null };
+export default function MarketplaceNavbar({ user, categories, cartQuantity }: Props) {
   return (
     <header className={styles.header}>
       <div className={styles.topline}>
@@ -33,11 +33,7 @@ export default function MarketplaceNavbar({ user, categories }: Props) {
             </Suspense>
           </div>
           <div className={styles.account}>
-            {(!user || user.role === "Customer") && (
-              <Link href={user ? "/cart" : "/auth"} className={styles.cartLink} aria-label="Keranjang belanja" title="Keranjang belanja">
-                <Icon name="cart" />
-              </Link>
-            )}
+            <CartLink role={user?.role ?? null} quantity={cartQuantity} />
             <Link
               href={user ? "/account" : "/auth"}
               className={styles.accountLink}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import CartLink from "@/features/cart/components/CartLink";
 import Brand from "@/components/brand/Brand";
 import LogoutButton from "@/features/auth/LogoutButton";
 import type { SessionUser } from "@/lib/auth/session";
@@ -15,6 +16,7 @@ const links = [
 
 type NavbarProps = {
   user: SessionUser | null;
+  cartQuantity: number | null;
 };
 
 function UserIdentity({ user }: { user: SessionUser }) {
@@ -38,7 +40,7 @@ function UserIdentity({ user }: { user: SessionUser }) {
   );
 }
 
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar({ user, cartQuantity }: NavbarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -94,6 +96,8 @@ export default function Navbar({ user }: NavbarProps) {
             className="h-5 w-px bg-border"
           />
 
+          <CartLink role={user?.role ?? null} quantity={cartQuantity} />
+
           {user ? (
             <>
               <UserIdentity user={user} />
@@ -111,6 +115,10 @@ export default function Navbar({ user }: NavbarProps) {
             </Link>
           )}
         </nav>
+
+        <div className="ml-auto md:hidden">
+          <CartLink role={user?.role ?? null} quantity={cartQuantity} />
+        </div>
 
         <button
           type="button"
