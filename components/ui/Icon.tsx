@@ -9,7 +9,10 @@ type IconName =
   | "close"
   | "grid"
   | "user"
-  | "box";
+  | "box"
+  | "cart"
+  | "minus"
+  | "trash";
 
 type IconProps = {
   name: IconName;
@@ -17,6 +20,9 @@ type IconProps = {
 };
 
 const paths: Record<IconName, string> = {
+  cart: "M3 3h2l3 12h10l3-9H6M9 21h.01M18 21h.01M8 15l-1 3h12",
+  minus: "M5 12h14",
+  trash: "M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7",
   search: "M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0",
   filter: "M4 7h16M7 12h10M10 17h4",
   close: "m6 6 12 12M18 6 6 18",

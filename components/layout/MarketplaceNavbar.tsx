@@ -7,6 +7,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import type { CatalogCategory } from "@/features/products/types/public-types";
 import CatalogSearch from "./CatalogSearch";
 import styles from "./marketplace.module.css";
+
 type Props = { user: SessionUser | null; categories: CatalogCategory[] };
 export default function MarketplaceNavbar({ user, categories }: Props) {
   return (
@@ -32,6 +33,11 @@ export default function MarketplaceNavbar({ user, categories }: Props) {
             </Suspense>
           </div>
           <div className={styles.account}>
+            {(!user || user.role === "Customer") && (
+              <Link href={user ? "/cart" : "/auth"} className={styles.cartLink} aria-label="Keranjang belanja" title="Keranjang belanja">
+                <Icon name="cart" />
+              </Link>
+            )}
             <Link
               href={user ? "/account" : "/auth"}
               className={styles.accountLink}

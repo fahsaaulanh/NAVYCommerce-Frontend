@@ -1,23 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import Button from "@/components/ui/Button";
+import AddToCartPanel from "@/features/cart/components/AddToCartPanel";
 import ProductGallery from "../shared/ProductGallery";
 import ProductIcon from "../shared/ProductIcon";
+import styles from "./product-detail.module.css";
+import { formatCurrency, formatNumber } from "@/lib/format";
 
 import type { PublicProductDetailData } from "../../types/public-types";
 import type { ProductOptionValue } from "../../types/types";
-
-const currency = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-  maximumFractionDigits: 2,
-});
-
-const number = new Intl.NumberFormat("id-ID");
 
 type Props = {
   detail: PublicProductDetailData;
@@ -144,10 +140,10 @@ export default function PublicProductDetail({ detail }: Props) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className={styles.page}>
       <nav
         aria-label="Breadcrumb"
-        className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted"
+        className={styles.breadcrumb}
       >
         <Link href="/" className="hover:text-primary">
           Beranda
@@ -163,39 +159,41 @@ export default function PublicProductDetail({ detail }: Props) {
 
         <span
           aria-current="page"
-          className="min-w-0 break-words text-foreground"
+          className={styles.currentCrumb}
         >
           {product.title}
         </span>
       </nav>
 
-      <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
-        <ProductGallery
-          title={product.title}
-          images={images}
-          selectedImageId={selectedImageId}
-          onSelectImage={setSelectedImageId}
-          onReload={refresh}
-          refreshing={refreshing}
-        />
+      <div className={styles.productLayout}>
+        <div className={styles.galleryColumn}>
+          <ProductGallery
+            title={product.title}
+            images={images}
+            selectedImageId={selectedImageId}
+            onSelectImage={setSelectedImageId}
+            onReload={refresh}
+            refreshing={refreshing}
+          />
+          <p className={styles.galleryCaption}>
+            Pilih foto untuk melihat detail produk dengan lebih jelas.
+          </p>
+        </div>
 
         <section
           aria-labelledby="product-title"
-          className="min-w-0 rounded-3xl border border-border bg-surface p-5 sm:p-7"
+          className={styles.purchasePanel}
         >
-          <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+          <p className={styles.category}>
             {categoryName || "Produk"}
           </p>
 
-          <h1
-            id="product-title"
-            className="mt-3 break-words text-3xl font-semibold tracking-tight text-foreground"
-          >
+          <h1 id="product-title" className={styles.title}>
             {product.title}
           </h1>
 
-          <div className="mt-6 rounded-2xl bg-background p-5">
-            <p className="text-xs text-muted">
+          <div className={styles.pricePanel}>
+            <p className={styles.priceLabel}>
               {selectedVariant
                 ? "Harga varian terpilih"
                 : minPrice !== maxPrice
@@ -203,24 +201,24 @@ export default function PublicProductDetail({ detail }: Props) {
                   : "Harga produk"}
             </p>
 
-            <p className="mt-2 break-words text-2xl font-bold tracking-tight text-primary">
+            <p className={styles.price}>
               {selectedVariant
-                ? currency.format(selectedVariant.price)
+                ? formatCurrency(selectedVariant.price)
                 : minPrice === maxPrice
-                  ? currency.format(minPrice)
-                  : `${currency.format(minPrice)} – ${currency.format(maxPrice)}`}
+                  ? formatCurrency(minPrice)
+                  : `${formatCurrency(minPrice)} – ${formatCurrency(maxPrice)}`}
             </p>
 
-            <p className="mt-2 text-xs leading-5 text-muted">
+            <p className={styles.priceHint}>
               {options.length > 0
                 ? "Pilih kombinasi untuk melihat harga dan stok."
                 : "Produk ini tersedia tanpa pilihan tambahan."}
             </p>
           </div>
 
-          <div className="mt-7">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-sm font-semibold text-foreground">
+          <div className={styles.variants}>
+            <div className={styles.variantsHeading}>
+              <h2 className={styles.sectionTitle}>
                 {options.length > 0
                   ? "Pilih varian"
                   : "Ketersediaan produk"}
@@ -237,17 +235,20 @@ export default function PublicProductDetail({ detail }: Props) {
               )}
             </div>
 
-            <div className="mt-5 space-y-6">
+            <div className={styles.optionGroups}>
               {options.map((option) => (
-                <fieldset key={option.id} className="min-w-0">
-                  <legend className="text-sm font-medium text-foreground">
+                <fieldset key={option.id} className={styles.optionGroup}>
+                  <legend className={styles.optionName}>
                     {option.name}
                   </legend>
 
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className={styles.optionValues}>
                     {option.values.map((value) => {
                       const selected =
                         selection[option.id] === value.id;
+                      const optionImage = value.imageId
+                        ? images.find((image) => image.id === value.imageId)
+                        : undefined;
 
                       return (
                         <button
@@ -257,20 +258,30 @@ export default function PublicProductDetail({ detail }: Props) {
                           onClick={() =>
                             selectOption(option.id, value)
                           }
-                          className={`inline-flex min-h-11 max-w-full items-center gap-2 rounded-xl border px-4 py-2 text-left text-sm font-medium transition-colors ${
-                            selected
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-surface text-foreground hover:border-primary/50 hover:bg-background"
-                          }`}
+                          className={`${styles.optionValue} ${selected
+                              ? styles.optionValueSelected
+                              : ""
+                            }`}
                         >
-                          <span className="min-w-0 break-words">
+                          {optionImage && (
+                            <span className={styles.optionThumbnail}>
+                              <Image
+                                src={optionImage.url}
+                                alt=""
+                                fill
+                                unoptimized
+                                sizes="32px"
+                              />
+                            </span>
+                          )}
+                          <span className={styles.optionValueText}>
                             {value.value}
                           </span>
 
                           {selected && (
                             <ProductIcon
                               name="check"
-                              className="size-4 shrink-0"
+                              className={styles.checkIcon}
                             />
                           )}
                         </button>
@@ -283,28 +294,24 @@ export default function PublicProductDetail({ detail }: Props) {
 
             <div
               role="status"
-              className="mt-6 rounded-2xl border border-border bg-background p-4"
+              className={`${styles.stockNotice} ${selectedVariant?.stockQuantity ? styles.stockAvailable : ""} ${selectedVariant && selectedVariant.stockQuantity <= 0 ? styles.stockUnavailable : ""}`}
             >
               {selectedVariant ? (
                 <>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className={styles.selectedCombination}>
                     {selectedLabels.join(" · ") || "Varian standar"}
                   </p>
 
                   <p
-                    className={`mt-2 text-sm ${
-                      selectedVariant.stockQuantity > 0
-                        ? "text-success"
-                        : "text-danger"
-                    }`}
+                    className={styles.stockText}
                   >
                     {selectedVariant.stockQuantity > 0
-                      ? `Tersedia ${number.format(selectedVariant.stockQuantity)} unit`
+                      ? `Tersedia ${formatNumber(selectedVariant.stockQuantity)} unit`
                       : "Varian ini sedang habis."}
                   </p>
                 </>
               ) : (
-                <p className="text-sm leading-6 text-muted">
+                <p className={styles.stockText}>
                   {!hasStock
                     ? "Stok seluruh varian sedang habis."
                     : selectedLabels.length === options.length
@@ -315,12 +322,15 @@ export default function PublicProductDetail({ detail }: Props) {
             </div>
           </div>
 
-          <dl className="mt-6 border-t border-border pt-5 text-sm">
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted">Berat produk</dt>
-              <dd className="font-medium text-foreground">
-                {number.format(product.weightGrams)} gram
-              </dd>
+          <AddToCartPanel
+            key={selectedVariant?.id ?? "choose-variant"}
+            variant={selectedVariant}
+          />
+
+          <dl className={styles.specifications}>
+            <div className={styles.specificationRow}>
+              <dt>Berat produk</dt>
+              <dd>{formatNumber(product.weightGrams)} gram</dd>
             </div>
           </dl>
         </section>
@@ -328,39 +338,40 @@ export default function PublicProductDetail({ detail }: Props) {
 
       <section
         aria-labelledby="public-store-heading"
-        className="mt-8 flex items-center gap-4 rounded-2xl border border-border bg-surface p-5 sm:p-6"
+        className={styles.storeCard}
       >
-        <div
-          aria-hidden="true"
-          className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-lg font-semibold text-primary"
-        >
+        <div aria-hidden="true" className={styles.storeAvatar}>
           {Array.from(store.name)[0]?.toUpperCase() || "T"}
         </div>
 
-        <div className="min-w-0">
-          <p className="text-xs text-muted">Dijual oleh</p>
+        <div className={styles.storeDetails}>
+          <p className={styles.storeEyebrow}>Toko penjual</p>
 
-          <h2
-            id="public-store-heading"
-            className="mt-1 break-words font-semibold text-foreground"
-          >
+          <h2 id="public-store-heading" className={styles.storeName}>
             {store.name}
           </h2>
         </div>
+
+        <span className={styles.storeSlug}>/{store.slug}</span>
       </section>
 
       <section
         aria-labelledby="public-description-heading"
-        className="mt-6 rounded-3xl border border-border bg-surface p-5 sm:p-7"
+        className={styles.descriptionCard}
       >
-        <h2
-          id="public-description-heading"
-          className="text-lg font-semibold text-foreground"
-        >
-          Deskripsi produk
-        </h2>
+        <div className={styles.descriptionHeader}>
+          <span className={styles.descriptionIcon} aria-hidden="true">
+            <ProductIcon name="layers" />
+          </span>
+          <div>
+            <p className={styles.descriptionEyebrow}>Detail produk</p>
+            <h2 id="public-description-heading" className={styles.descriptionTitle}>
+              Deskripsi produk
+            </h2>
+          </div>
+        </div>
 
-        <p className="mt-5 whitespace-pre-wrap break-words text-sm leading-7 text-muted [overflow-wrap:anywhere]">
+        <p className={styles.descriptionText}>
           {product.description?.trim() ||
             "Belum ada deskripsi produk."}
         </p>

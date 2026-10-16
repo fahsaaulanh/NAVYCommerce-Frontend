@@ -1,0 +1,29 @@
+.workspace {
+  display: contents;
+}
+
+.main {
+  min-width: 0;
+}
+
+.footer {
+  padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 1024px) and (min-height: 740px) {
+  .workspace {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100dvh;
+    flex: none;
+  }
+
+  .main {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .footer {
+    padding-bottom: 0;
+  }
+}
