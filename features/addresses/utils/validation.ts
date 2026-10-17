@@ -1,11 +1,10 @@
 import { regionPatterns } from "@/features/regions/types/region";
 import type { SaveAddressPayload } from "../types/address";
 
-export function isAddressId(value: unknown): value is string {
-  return typeof value === "string" &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value) &&
-    value !== "00000000-0000-0000-0000-000000000000";
-}
+export {
+  isGuid as isAddressId,
+  normalizeFieldErrors as normalizeAddressErrors,
+} from "@/lib/validation";
 
 export function parseAddress(formData: FormData): {
   payload: SaveAddressPayload;
@@ -33,10 +32,13 @@ export function parseAddress(formData: FormData): {
   for (const [key, label, limit] of required) {
     const value = payload[key];
     if (!value) fieldErrors[key] = [`${label} wajib diisi.`];
-    else if (value.length > limit) fieldErrors[key] = [`${label} maksimal ${limit} karakter.`];
+    else if (value.length > limit)
+      fieldErrors[key] = [`${label} maksimal ${limit} karakter.`];
   }
   if (!/^\+?[0-9]{8,15}$/.test(payload.phoneNumber))
-    fieldErrors.phoneNumber = ["Gunakan 8–15 digit, boleh diawali +, tanpa spasi."];
+    fieldErrors.phoneNumber = [
+      "Gunakan 8–15 digit, boleh diawali +, tanpa spasi.",
+    ];
   if (!regionPatterns.village.test(payload.villageCode))
     fieldErrors.villageCode = ["Pilih kelurahan atau desa yang valid."];
   if (!/^[0-9]{5}$/.test(payload.postalCode))
@@ -44,14 +46,4 @@ export function parseAddress(formData: FormData): {
   if ((payload.deliveryNotes?.length ?? 0) > 250)
     fieldErrors.deliveryNotes = ["Catatan pengiriman maksimal 250 karakter."];
   return { payload, fieldErrors };
-}
-
-export function normalizeAddressErrors(errors: Record<string, string[]>): Record<string, string[]> {
-  const result: Record<string, string[]> = {};
-  for (const [key, messages] of Object.entries(errors)) {
-    const field = key.split(".").at(-1) ?? key;
-    const name = field.charAt(0).toLowerCase() + field.slice(1);
-    result[name] = [...(result[name] ?? []), ...messages];
-  }
-  return result;
 }

@@ -57,7 +57,7 @@ export default function CreateStoreForm() {
             minLength={2}
             maxLength={150}
             value={name}
-            onChange={event => {
+            onChange={(event) => {
               const value = event.target.value;
               setName(value);
 
@@ -94,7 +94,7 @@ export default function CreateStoreForm() {
             autoCorrect="off"
             spellCheck={false}
             value={slug}
-            onChange={event => {
+            onChange={(event) => {
               setSlugEdited(true);
               setSlug(event.target.value);
             }}
@@ -120,10 +120,7 @@ export default function CreateStoreForm() {
             htmlFor="store-description"
             className="mb-2 block text-sm font-semibold text-foreground"
           >
-            Deskripsi{" "}
-            <span className="font-normal text-muted">
-              (opsional)
-            </span>
+            Deskripsi <span className="font-normal text-muted">(opsional)</span>
           </label>
 
           <textarea
@@ -132,15 +129,11 @@ export default function CreateStoreForm() {
             rows={5}
             maxLength={2000}
             value={description}
-            onChange={event =>
-              setDescription(event.target.value)
-            }
+            onChange={(event) => setDescription(event.target.value)}
             placeholder="Ceritakan produk dan karakter tokomu."
             aria-invalid={Boolean(state.errors?.description)}
             aria-describedby={
-              state.errors?.description
-                ? "store-description-error"
-                : undefined
+              state.errors?.description ? "store-description-error" : undefined
             }
             className="w-full resize-y rounded-2xl border border-border bg-background/70 px-4 py-3 text-base text-foreground transition-colors placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:opacity-60"
           />
@@ -167,9 +160,7 @@ export default function CreateStoreForm() {
 
       <div className="mt-5 text-center">
         {pending ? (
-          <span className="text-sm text-muted">
-            Sedang menyimpan toko…
-          </span>
+          <span className="text-sm text-muted">Sedang menyimpan toko…</span>
         ) : (
           <Link
             href="/seller/stores"

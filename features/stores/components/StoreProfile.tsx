@@ -73,12 +73,22 @@ export default function StoreProfile({ store }: StoreProfileProps) {
             </Link>
           </div>
 
-          <Link
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
               href={`/seller/stores/${store.id}/products`}
-              className="action-button mt-5"
+              className="action-button action-button--primary"
             >
+              <Icon name="box" />
               Kelola produk
             </Link>
+            <Link
+              href={`/seller/stores/${store.id}/shipping-origin`}
+              className="action-button action-button--outline"
+            >
+              <Icon name="store" />
+              Alamat pengiriman
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -108,8 +118,8 @@ export default function StoreProfile({ store }: StoreProfileProps) {
                 Deskripsi belum ditambahkan
               </p>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Deskripsi membantu pelanggan mengenal toko dan produk
-                yang kamu tawarkan.
+                Deskripsi membantu pelanggan mengenal toko dan produk yang kamu
+                tawarkan.
               </p>
             </div>
           )}
