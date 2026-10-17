@@ -7,6 +7,7 @@ import Icon from "@/components/ui/Icon";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { deleteAddressAction, setDefaultAddressAction } from "../actions/address-actions";
 import type { AddressActionResult, CustomerAddress } from "../types/address";
+import AddressDetails from "./AddressDetails";
 import AddressSymbol from "./AddressSymbol";
 import styles from "./addresses.module.css";
 
@@ -28,8 +29,10 @@ export default function AddressBook({ addresses, notice }: Props) {
         setResult(next);
         if (next.ok) setDeleting(null);
       } catch {
-        setResult({ ok: false, fieldErrors: {}, outcomeUnknown: true,
-          message: "Status perubahan belum dapat dipastikan. Muat ulang daftar alamat sebelum mencoba kembali." });
+        setResult({
+          ok: false, fieldErrors: {}, outcomeUnknown: true,
+          message: "Status perubahan belum dapat dipastikan. Muat ulang daftar alamat sebelum mencoba kembali."
+        });
       } finally { setBusyId(null); }
     });
   }
@@ -64,10 +67,7 @@ export default function AddressBook({ addresses, notice }: Props) {
               <h2>{address.label}</h2>
               {address.isDefault && <span className={styles.badge}><AddressSymbol name="check" />Utama</span>}
             </div>
-            <div className={styles.recipient}><strong>{address.recipientName}</strong><span>{address.phoneNumber}</span></div>
-            <p className={styles.street}>{address.addressLine}</p>
-            <p className={styles.locality}>{[address.village, address.district, address.city, address.province].filter(Boolean).join(", ")} {address.postalCode}</p>
-            {address.deliveryNotes && <p className={styles.deliveryNotes}><span>Catatan:</span> {address.deliveryNotes}</p>}
+            <AddressDetails address={address} />
             <div className={styles.cardActions}>
               <Link href={`/account/addresses/${address.id}/edit`} aria-disabled={pending}
                 onClick={event => { if (pending) event.preventDefault(); }}

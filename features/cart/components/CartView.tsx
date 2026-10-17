@@ -7,6 +7,7 @@ import { formatNumber } from "@/lib/format";
 import { removeCartItemAction, updateCartItemAction } from "../actions/cart-actions";
 import type { Cart, CartActionResult, CartItem } from "../types/cart";
 import CartItemRow from "./CartItemRow";
+import { groupCartItems } from "../utils/group-items";
 import CartSummary from "./CartSummary";
 import styles from "./cart.module.css";
 
@@ -14,12 +15,7 @@ export default function CartView({ cart }: { cart: Cart }) {
   const [selection, setSelection] = useState<Record<string, boolean>>({});
   const [result, setResult] = useState<CartActionResult | null>(null);
   const [pending, startTransition] = useTransition();
-  const groups = new Map<string, { name: string; items: CartItem[] }>();
-  for (const item of cart.items) {
-    const group = groups.get(item.storeId) ?? { name: item.storeName, items: [] };
-    group.items.push(item);
-    groups.set(item.storeId, group);
-  }
+  const groups = groupCartItems(cart.items);
   const isSelected = (item: CartItem) => item.canCheckout && selection[item.id] !== false;
   const available = cart.items.filter((item) => item.canCheckout);
   const selected = cart.items.filter(isSelected);
@@ -90,7 +86,7 @@ export default function CartView({ cart }: { cart: Cart }) {
             })}
             <p className={styles.footnote}>Menambahkan produk ke keranjang belum memesan stok. Harga dan ketersediaan dapat berubah.</p>
           </div>
-          <CartSummary subtotal={subtotal} quantity={quantity} />
+          <CartSummary subtotal={subtotal} quantity={quantity} itemIds={selected.map(item => item.id)} pending={pending} />
         </div>}
     </div>
   );

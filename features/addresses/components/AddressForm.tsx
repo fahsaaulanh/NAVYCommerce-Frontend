@@ -13,9 +13,9 @@ import type { AddressActionResult, CustomerAddress } from "../types/address";
 import AddressSymbol from "./AddressSymbol";
 import styles from "./addresses.module.css";
 
-type Props = { address?: CustomerAddress; defaultRecipient: string };
+type Props = { address?: CustomerAddress; defaultRecipient: string; returnTo?: string };
 
-export default function AddressForm({ address, defaultRecipient }: Props) {
+export default function AddressForm({ address, defaultRecipient, returnTo }: Props) {
   const router = useRouter();
   const feedback = useRef<HTMLDivElement>(null);
   const [pending, startTransition] = useTransition();
@@ -31,8 +31,10 @@ export default function AddressForm({ address, defaultRecipient }: Props) {
   const blocked = pending || !!failure?.outcomeUnknown || !!failure?.authRequired;
 
   function errorProps(name: string) {
-    return { "aria-invalid": !!errors[name]?.length,
-      "aria-describedby": errors[name]?.length ? `address-${name}-error` : undefined };
+    return {
+      "aria-invalid": !!errors[name]?.length,
+      "aria-describedby": errors[name]?.length ? `address-${name}-error` : undefined
+    };
   }
   function fieldError(name: string) {
     return errors[name]?.length ? <p id={`address-${name}-error`} className={styles.fieldError}>{errors[name].join(" ")}</p> : null;
@@ -47,11 +49,19 @@ export default function AddressForm({ address, defaultRecipient }: Props) {
       startTransition(async () => {
         try {
           const next = await saveAddressAction(address?.id ?? null, formData);
-          if (next.ok) router.push(`/account/addresses?notice=${address ? "updated" : "created"}`);
+          if (next.ok) {
+            if (returnTo) {
+              const target = new URL(returnTo, window.location.origin);
+              if (next.addressId) target.searchParams.set("address", next.addressId);
+              router.push(target.pathname + target.search);
+            } else router.push(`/account/addresses?notice=${address ? "updated" : "created"}`);
+          }
           else setResult(next);
         } catch {
-          setResult({ ok: false, fieldErrors: {}, outcomeUnknown: true,
-            message: "Status penyimpanan belum dapat dipastikan. Periksa daftar alamat sebelum mengulangi." });
+          setResult({
+            ok: false, fieldErrors: {}, outcomeUnknown: true,
+            message: "Status penyimpanan belum dapat dipastikan. Periksa daftar alamat sebelum mengulangi."
+          });
         }
       });
     }}>
@@ -100,7 +110,7 @@ export default function AddressForm({ address, defaultRecipient }: Props) {
       <div className={styles.formFooter}>
         <p>Periksa nama penerima dan nomor telepon sebelum menyimpan.</p>
         <div>
-          <Link href="/account/addresses" className="action-button action-button--outline" aria-disabled={pending}
+          <Link href={returnTo ?? "/account/addresses"} className="action-button action-button--outline" aria-disabled={pending}
             onClick={event => { if (pending) event.preventDefault(); }}>Batal</Link>
           <Button type="submit" loading={pending} disabled={blocked || !regionPicker.ready} icon={<AddressSymbol name="check" />}>{address ? "Simpan perubahan" : "Simpan alamat"}</Button>
         </div>

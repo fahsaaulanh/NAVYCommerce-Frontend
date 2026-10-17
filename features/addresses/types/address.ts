@@ -19,9 +19,16 @@ export type CustomerAddress = {
   updatedAt: string;
 };
 
-export type SaveAddressPayload = Pick<CustomerAddress,
-  "label" | "recipientName" | "phoneNumber" | "villageCode" |
-  "postalCode" | "addressLine" | "deliveryNotes">;
+export type SaveAddressPayload = Pick<
+  CustomerAddress,
+  | "label"
+  | "recipientName"
+  | "phoneNumber"
+  | "villageCode"
+  | "postalCode"
+  | "addressLine"
+  | "deliveryNotes"
+>;
 
 export type AddressListResponse = { data: CustomerAddress[] };
 export type AddressMutationResponse = {
@@ -30,7 +37,7 @@ export type AddressMutationResponse = {
   data: CustomerAddress | null;
 };
 export type AddressActionResult =
-  | { ok: true; message: string }
+  | { ok: true; message: string; addressId?: string }
   | {
       ok: false;
       message: string;

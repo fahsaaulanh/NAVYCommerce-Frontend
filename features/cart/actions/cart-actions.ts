@@ -40,6 +40,7 @@ async function mutate(
   }
 
   revalidatePath("/cart", "layout");
+  revalidatePath("/checkout");
   revalidatePath("/products", "layout");
   revalidatePath("/(storefront)", "layout");
   return result;
