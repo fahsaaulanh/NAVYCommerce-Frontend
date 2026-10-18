@@ -3,20 +3,20 @@ import { Suspense } from "react";
 import CartLink from "@/features/cart/components/CartLink";
 import Brand from "@/components/brand/Brand";
 import Icon from "@/components/ui/Icon";
-import LogoutButton from "@/features/auth/LogoutButton";
+import MarketplaceAccountMenu from "./MarketplaceAccountMenu";
 import type { SessionUser } from "@/lib/auth/session";
 import type { CatalogCategory } from "@/features/products/types/public-types";
 import CatalogSearch from "./CatalogSearch";
 import styles from "./marketplace.module.css";
-type Props = { user: SessionUser | null; categories: CatalogCategory[]; cartQuantity: number | null };
-export default function MarketplaceNavbar({ user, categories, cartQuantity }: Props) {
+type Props = { user: SessionUser | null; categories?: CatalogCategory[]; cartQuantity: number | null };
+export default function MarketplaceNavbar({ user, categories = [], cartQuantity }: Props) {
   return (
     <header className={styles.header}>
       <div className={styles.topline}>
         <div className={`${styles.container} ${styles.toplineInner}`}>
-          <span>Temukan pilihanmu. Dukung usaha lokal.</span>
-          <Link href={user?.role === "Seller" ? "/seller" : "/auth"}>
-            {user?.role === "Seller" ? "Seller Center" : "Akun merchant"}
+          <span>Temukan pilihanmu dari beragam toko.</span>
+          <Link href={user?.role === "Seller" ? "/seller" : user ? "/account" : "/auth"}>
+            {user?.role === "Seller" ? "Seller Center" : "Mulai dari akunmu"}
           </Link>
         </div>
       </div>
@@ -34,28 +34,7 @@ export default function MarketplaceNavbar({ user, categories, cartQuantity }: Pr
           </div>
           <div className={styles.account}>
             <CartLink role={user?.role ?? null} quantity={cartQuantity} />
-            <Link
-              href={user ? "/account" : "/auth"}
-              className={styles.accountLink}
-              aria-label={
-                user ? `Buka akun ${user.fullName}` : "Masuk atau daftar"
-              }
-            >
-              <span className={styles.accountIcon}>
-                <Icon name="user" />
-              </span>
-              <span className={styles.accountText}>
-                <small>
-                  {user ? "Selamat datang" : "Halo, selamat datang"}
-                </small>
-                {user ? user.fullName : "Masuk / Daftar"}
-              </span>
-            </Link>
-            {user && (
-              <span className={styles.logout}>
-                <LogoutButton />
-              </span>
-            )}
+            <MarketplaceAccountMenu user={user} />
           </div>
         </div>
         <nav aria-label="Navigasi belanja" className={styles.subnav}>
@@ -63,6 +42,7 @@ export default function MarketplaceNavbar({ user, categories, cartQuantity }: Pr
             <Icon name="grid" /> Semua produk
           </Link>
           <div className={styles.categoryLinks}>
+            <Link href="/">Beranda</Link>
             {categories
               .filter((item) => item.productCount > 0)
               .slice(0, 7)

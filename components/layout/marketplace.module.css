@@ -79,9 +79,6 @@
   border-left: 1px solid var(--border);
 }
 
-.logout {
-  display: inline-flex;
-}
 .accountLink {
   display: flex;
   align-items: center;
@@ -210,9 +207,6 @@
   .accountText {
     display: none;
   }
-  .logout {
-    display: none;
-  }
   .accountText small {
     display: none;
   }
@@ -248,4 +242,55 @@
   .search button {
     transition: none;
   }
+}
+
+/* Akun yang sama dipakai beranda, katalog, keranjang, dan checkout. */
+.header { position: relative; z-index: 30; }
+.mainbar { gap: 32px; padding-block: 20px; }
+.account { gap: 16px; }
+.accountMenu { position: relative; min-width: 0; }
+.accountMenu summary { cursor: pointer; list-style: none; border-radius: 10px; padding: 4px; }
+.accountMenu summary::-webkit-details-marker { display: none; }
+.accountMenu summary:hover { background: var(--background); }
+.accountChevron { width: 13px !important; height: 13px !important; transform: rotate(90deg); color: var(--muted); }
+.accountDropdown { position: absolute; z-index: 60; right: 0; top: calc(100% + 12px); width: 260px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 14px 45px #1420391c; padding: 8px; }
+.dropdownIdentity { display: grid; gap: 5px; padding: 12px 10px 15px; margin-bottom: 5px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.dropdownIdentity strong { font-size: 13px; font-weight: 650; }
+.dropdownIdentity span { font-size: 11px; color: var(--muted); }
+.accountDropdown > a { display: flex; align-items: center; gap: 10px; padding: 11px 10px; font-size: 12px; border-radius: 7px; color: var(--muted); }
+.accountDropdown > a:hover { background: var(--background); color: var(--primary); }
+.accountDropdown > a svg { width: 16px; height: 16px; }
+.dropdownLogout { margin-top: 5px; border-top: 1px solid var(--border); padding-top: 5px; }
+.dropdownLogout button { width: 100%; justify-content: flex-start; min-height: 40px; padding: 10px; font-size: 12px; }
+.signIn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; color: var(--primary); font-size: 12px; font-weight: 650; white-space: nowrap; transition: border-color 160ms ease, background-color 160ms ease; }
+.signIn:hover { border-color: var(--primary); background: var(--background); }
+.signIn svg { width: 17px; height: 17px; }
+.footerTop { grid-template-columns: 1.5fr .8fr .9fr 1fr; gap: 40px; padding-block: 38px; }
+.footerExplore { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--primary); }
+.footerExplore svg { width: 15px; height: 15px; }
+.footerDemo { border-left: 1px solid var(--border); padding-left: 28px; }
+.footerDemo > span { font-size: 9px; letter-spacing: .1em; color: var(--muted); font-weight: 650; }
+.footerDemo h2 { font-size: 15px; line-height: 1.6; margin: 9px 0 10px; }
+.footerDemo p { font-size: 11px; }
+@media (max-width: 1100px) { .mainbar { gap: 20px; } .account { padding-left: 16px; gap: 12px; } .accountText { max-width: 110px; } .footerTop { grid-template-columns: 1.3fr 1fr 1fr; gap: 28px; } .footerDemo { grid-column: 1/-1; padding: 18px 0 0; border-left: 0; border-top: 1px solid var(--border); } .footerDemo h2 { display: inline; margin-left: 12px; font-size: 13px; } .footerDemo p { margin-top: 6px; } }
+@media (max-width: 767px) { .mainbar { gap: 12px; padding-block: 16px; } .account { padding-left: 0; gap: 10px; } .accountLink { gap: 3px; } .accountChevron { width: 11px !important; height: 11px !important; } .signIn { padding: 9px 10px; font-size: 11px; } .signIn svg { display: none; } .accountDropdown { width: min(260px, calc(100vw - 32px)); } .footerTop { grid-template-columns: 1fr 1fr; gap: 28px; } .footerBrand { grid-column: 1/-1; } .footerDemo { grid-column: 1/-1; } .footerDemo h2 { display: block; margin: 7px 0; } .footerAbout { max-width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .signIn { transition: none; } }
+
+@media (max-width: 767px) {
+  .mainbar > a:first-child > span { gap: 8px; }
+  .mainbar > a:first-child > span > span:first-child { width: 32px; height: 32px; }
+  .mainbar > a:first-child > span > span:last-child { font-size: 16px; }
+}
+@media (max-width: 374px) {
+  .mainbar { gap: 8px; }
+  .mainbar > a:first-child > span { gap: 6px; }
+  .mainbar > a:first-child > span > span:first-child { width: 28px; height: 28px; }
+  .mainbar > a:first-child > span > span:last-child { font-size: 14px; }
+  .account { gap: 6px; }
+  .signIn { padding: 8px; font-size: 10px; }
+}
+
+@media (max-width: 374px) {
+  .signIn > span, .signIn > svg { display: none !important; }
+  .signIn::after { content: "Masuk"; font-size: 11px; }
 }

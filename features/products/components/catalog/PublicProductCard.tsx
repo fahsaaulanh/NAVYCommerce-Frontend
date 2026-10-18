@@ -8,11 +8,14 @@ import type { PublicProductSummary } from "../../types/public-types";
 import styles from "./catalog.module.css";
 export default function PublicProductCard({
   product,
+  headingLevel = 2,
 }: {
   product: PublicProductSummary;
+  headingLevel?: 2 | 3;
 }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const photo = product.thumbnail;
+  const Heading = headingLevel === 3 ? "h3" : "h2";
   return (
     <Link
       href={`/products/${encodeURIComponent(product.id)}`}
@@ -44,7 +47,7 @@ export default function PublicProductCard({
           <p className={styles.cardCategory}>
             {product.categoryName || "Produk"}
           </p>
-          <h2 className={styles.cardTitle}>{product.title}</h2>
+          <Heading className={styles.cardTitle}>{product.title}</Heading>
           <p className={styles.cardPrice}>{formatCurrency(product.minPrice)}</p>
           <p className={styles.cardRange}>
             {product.minPrice !== product.maxPrice
