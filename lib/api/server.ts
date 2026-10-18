@@ -27,6 +27,7 @@ async function backendRequest<T>(
   path: string,
   method: BackendMethod,
   body?: unknown,
+  options?: { timeoutMs?: number },
 ): Promise<T> {
   const user = await getSession();
 
@@ -75,7 +76,7 @@ async function backendRequest<T>(
             ? body
             : JSON.stringify(body),
       cache: "no-store",
-      signal: AbortSignal.timeout(isMultipart ? 30_000 : 10_000),
+      signal: AbortSignal.timeout(options?.timeoutMs ?? (isMultipart ? 30_000 : 10_000)),
     });
   } catch {
     throw new BackendApiError(
@@ -163,8 +164,8 @@ export function backendGet<T>(path: string): Promise<T> {
   return backendRequest<T>(path, "GET");
 }
 
-export function backendPost<T>(path: string, body: unknown): Promise<T> {
-  return backendRequest<T>(path, "POST", body);
+export function backendPost<T>(path: string, body: unknown, options?: { timeoutMs?: number }): Promise<T> {
+  return backendRequest<T>(path, "POST", body, options);
 }
 
 export function backendPut<T>(path: string, body: unknown): Promise<T> {

@@ -108,3 +108,9 @@
 }
 @media (max-height: 450px) { .mobileBar { display: none; } .desktopAction { display: block; } }
 @media (prefers-reduced-motion: reduce) { .addressOption { transition: none; } }
+
+.shippingControls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px; background: var(--surface); }
+.shippingControls h2 { font-size: 14px; font-weight: 650; }
+.shippingControls p { margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.8; }
+.partialShipping { display: block; margin-top: 4px; font-size: 10px; font-weight: 400; }
+@media (max-width: 600px) { .shippingControls { padding: 16px; } .shippingControls > button { width: 100%; } }

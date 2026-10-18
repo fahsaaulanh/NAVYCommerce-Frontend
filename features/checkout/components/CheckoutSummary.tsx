@@ -3,11 +3,20 @@ import Icon from "@/components/ui/Icon";
 import { formatCurrency, formatNumber } from "@/lib/format";
 import styles from "./checkout.module.css";
 
-type Props = { subtotal: number; quantity: number; storeCount: number; hasAddress: boolean; hasProblems: boolean };
-export default function CheckoutSummary({ subtotal, quantity, storeCount, hasAddress, hasProblems }: Props) {
+type Props = {
+  subtotal: number; quantity: number; storeCount: number; hasAddress: boolean; hasProblems: boolean;
+  shippingCost: number; shippingComplete: boolean; shippingCount: number; hasQuote: boolean; pending: boolean;
+};
+export default function CheckoutSummary({ subtotal, quantity, storeCount, hasAddress, hasProblems,
+  shippingCost, shippingComplete, shippingCount, hasQuote, pending }: Props) {
   const reason = hasProblems ? "Periksa barang yang perlu diperbaiki di keranjang."
     : !hasAddress ? "Lengkapi alamat pengiriman terlebih dahulu."
-    : "Ongkir belum dapat dihitung. Pesanan belum dapat dilanjutkan.";
+    : pending ? "Sedang menghitung pilihan ongkir."
+    : !hasQuote ? "Hitung ongkir untuk melihat pilihan pengiriman."
+    : !shippingComplete ? "Lengkapi pilihan layanan pengiriman untuk setiap toko."
+    : "Demo sampai review checkout. Pembuatan pesanan belum tersedia.";
+  const total = subtotal + (shippingComplete ? shippingCost : 0);
+  const totalLabel = shippingComplete ? "Total belanja" : "Subtotal produk";
   return <>
     <aside className={styles.summary} aria-labelledby="checkout-summary">
       <h2 id="checkout-summary">Ringkasan belanja</h2>
@@ -15,14 +24,17 @@ export default function CheckoutSummary({ subtotal, quantity, storeCount, hasAdd
         <div><dt>Barang tersedia</dt><dd>{formatNumber(quantity)} unit</dd></div>
         <div><dt>Toko</dt><dd>{formatNumber(storeCount)} toko</dd></div>
         <div><dt>Subtotal produk</dt><dd>{formatCurrency(subtotal)}</dd></div>
-        <div><dt>Ongkos kirim</dt><dd className={styles.shippingUnknown}>Belum dihitung</dd></div>
+        <div><dt>Ongkos kirim</dt><dd className={shippingComplete ? undefined : styles.shippingUnknown}>
+          {shippingCount > 0 ? formatCurrency(shippingCost) : "Belum dipilih"}
+          {shippingCount > 0 && !shippingComplete && <small className={styles.partialShipping}>{shippingCount} dari {storeCount} toko</small>}
+        </dd></div>
       </dl>
-      <div className={styles.summaryTotal}><span>Subtotal sementara</span><strong>{formatCurrency(subtotal)}</strong></div>
+      <div className={styles.summaryTotal}><span>{totalLabel}</span><strong>{formatCurrency(total)}</strong></div>
       <div className={styles.desktopAction}><Button disabled className="w-full" icon={<Icon name="arrow-right" />}>Buat pesanan</Button></div>
       <p className={styles.summaryReason}>{reason}</p>
     </aside>
-    <div className={styles.mobileBar} role="region" aria-label="Subtotal dan aksi checkout">
-      <a href="#checkout-summary"><span>Subtotal sementara</span><strong>{formatCurrency(subtotal)}</strong><small>Lihat rincian ↑</small></a>
+    <div className={styles.mobileBar} role="region" aria-label="Total dan aksi checkout">
+      <a href="#checkout-summary"><span>{totalLabel}</span><strong>{formatCurrency(total)}</strong><small>Lihat rincian ↑</small></a>
       <Button disabled size="sm" icon={<Icon name="arrow-right" />}>Buat pesanan</Button>
     </div>
   </>;
