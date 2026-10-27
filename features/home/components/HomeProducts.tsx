@@ -1,68 +1,13 @@
 import Link from "next/link";
+import RefreshButton from "@/components/ui/RefreshButton";
 import Icon from "@/components/ui/Icon";
 import PublicProductCard from "@/features/products/components/catalog/PublicProductCard";
 import type { PublicProductSummary } from "@/features/products/types/public-types";
 import styles from "./home.module.css";
-
-export default function HomeProducts({
-  products,
-  unavailable,
-}: {
-  products: PublicProductSummary[];
-  unavailable: boolean;
-}) {
-  return (
-    <section className={styles.section} aria-labelledby="home-products">
-      <div className={styles.sectionHeading}>
-        <div>
-          <p className={styles.eyebrow}>ADA YANG BARU UNTUKMU</p>
-          <h2 id="home-products">Baru di NAVYCommerce</h2>
-          <p>
-            Produk terbaru dengan stok tersedia, langsung dari katalog toko.
-          </p>
-        </div>
-        <Link href="/products?sort=newest" className={styles.moreLink}>
-          Lihat semua
-          <Icon name="arrow-right" />
-        </Link>
-      </div>
-      {products.length ? (
-        <ul className={styles.products}>
-          {products.map((product) => (
-            <li key={product.id}>
-              <PublicProductCard product={product} headingLevel={3} />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className={styles.empty}>
-          <span>
-            <Icon name="box" className="size-7" />
-          </span>
-          <h3>
-            {unavailable
-              ? "Produk belum dapat dimuat"
-              : "Pilihan baru sedang disiapkan"}
-          </h3>
-          <p role="status">
-            {unavailable
-              ? "Coba muat ulang halaman atau kunjungi katalog beberapa saat lagi."
-              : "Produk dengan stok tersedia akan muncul di sini setelah dipublikasikan toko."}
-          </p>
-          {unavailable ? (
-            <a href="/" className="action-button action-button--outline">
-              Muat ulang beranda
-            </a>
-          ) : (
-            <Link
-              href="/products"
-              className="action-button action-button--outline"
-            >
-              Buka katalog
-            </Link>
-          )}
-        </div>
-      )}
-    </section>
-  );
+export default function HomeProducts({ id, title, products, unavailable, centered=false }: { id:string; title:string; products:PublicProductSummary[]; unavailable:boolean; centered?:boolean }) {
+  return <section className={styles.section} aria-labelledby={id}>
+    <div className={`${styles.sectionHeading} ${centered ? styles.centeredHeading : ""}`}><h2 id={id}>{title}</h2>{!centered && <Link href="/products" className={styles.moreLink}>Lihat semua<Icon name="arrow-right" /></Link>}</div>
+    {products.length ? <ul className={styles.products}>{products.slice(0,12).map(product => <li key={product.id}><PublicProductCard product={product} headingLevel={3} /></li>)}</ul>
+      : <div className={styles.empty}><p role="status">{unavailable ? "Produk belum dapat dimuat." : "Belum ada produk tersedia."}</p>{unavailable && <RefreshButton label="Coba kembali" />}</div>}
+  </section>;
 }

@@ -244,7 +244,7 @@
   }
 }
 
-/* Akun yang sama dipakai beranda, katalog, keranjang, dan checkout. */
+
 .header { position: relative; z-index: 30; }
 .mainbar { gap: 32px; padding-block: 20px; }
 .account { gap: 16px; }
@@ -293,4 +293,15 @@
 @media (max-width: 374px) {
   .signIn > span, .signIn > svg { display: none !important; }
   .signIn::after { content: "Masuk"; font-size: 11px; }
+}
+
+@media(max-width:767px) {
+  .mainbar { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:14px 10px; }
+  .searchSlot { grid-column:1/-1; order:3; }
+  .account { margin-left:0; }
+}
+@media(max-width:420px) {
+  .signIn > span,.signIn > svg { display:none; }
+  .signIn::after { content:"Masuk"; font-size:12px; }
+  .signIn { padding:8px 10px; }
 }

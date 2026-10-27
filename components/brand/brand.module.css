@@ -1,0 +1,4 @@
+.brand { display:inline-flex; align-items:center; flex-shrink:0; width:200px; vertical-align:middle; }
+.logo { display:block; width:100%; height:auto; overflow:hidden; }
+@media(max-width:767px) { .brand { width:176px; } }
+@media(max-width:374px) { .brand { width:152px; } }

@@ -15,14 +15,15 @@ export default async function EditAddressPage({ params, searchParams }: { params
   const { addressId } = await params;
   const returnTo = safeReturnTo((await searchParams).returnTo, ["/checkout"]);
   if (!isAddressId(addressId)) notFound();
-  let result;
-  try { result = await addressApi.getMine(); }
-  catch (error) {
-    if (!(error instanceof BackendApiError)) throw error;
-    return <AddressPageShell title="Ubah alamat" description="Perbarui informasi penerima dan tujuan pengiriman." form>
-      <AddressLoadError status={error.status} message={error.message} retryHref={`/account/addresses/${addressId}/edit`} />
-    </AddressPageShell>;
-  }
+  const loaded = await addressApi.getMine().then(result => ({ result,error:null }))
+    .catch((error:unknown) => {
+      if (!(error instanceof BackendApiError)) throw error;
+      return { result:null,error };
+    });
+  if (loaded.error) return <AddressPageShell title="Ubah alamat" description="Perbarui informasi penerima dan tujuan pengiriman." form>
+    <AddressLoadError status={loaded.error.status} message={loaded.error.message} retryHref={`/account/addresses/${addressId}/edit`} />
+  </AddressPageShell>;
+  const result = loaded.result!;
   const address = result.data.find(value => value.id === addressId);
   if (!address) notFound();
   return <AddressPageShell title="Ubah alamat" description="Perbarui informasi penerima dan tujuan pengiriman." form>

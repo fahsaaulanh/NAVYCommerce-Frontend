@@ -52,8 +52,8 @@ export default function CartView({ cart }: { cart: Cart }) {
     <div className={styles.page} aria-busy={pending}>
       <nav aria-label="Breadcrumb" className={styles.breadcrumb}><Link href="/products">Katalog produk</Link><span aria-hidden="true">/</span><span aria-current="page">Keranjang</span></nav>
       <header className={styles.heading}>
-        <div><p className={styles.eyebrow}>BELANJA PILIHANMU</p><h1>Keranjang belanja</h1>
-          <p>{cart.totalItems ? `${formatNumber(cart.totalItems)} varian produk dari ${formatNumber(groups.size)} toko` : "Simpan pilihan produkmu sebelum melanjutkan belanja."}</p></div>
+        <div><h1>Keranjang</h1>
+          {cart.totalItems > 0 && <p>{formatNumber(cart.totalItems)} produk · {formatNumber(groups.size)} toko</p>}</div>
         <Link href="/products" className="action-button action-button--outline action-button--sm"><Icon name="arrow-left" />Lanjut belanja</Link>
       </header>
 

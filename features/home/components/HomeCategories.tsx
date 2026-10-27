@@ -1,19 +1,42 @@
 import Link from "next/link";
-import Icon from "@/components/ui/Icon";
-import { formatNumber } from "@/lib/format";
-import type { CatalogCategory } from "@/features/products/types/public-types";
+import type { Category } from "@/features/categories/types";
+import RefreshButton from "@/components/ui/RefreshButton";
+import CategoryIcon from "./CategoryIcon";
 import styles from "./home.module.css";
 
-export default function HomeCategories({ categories, unavailable }: { categories: CatalogCategory[]; unavailable: boolean }) {
-  const displayed = [...categories].sort((a,b) => b.productCount-a.productCount || a.name.localeCompare(b.name, "id")).slice(0,8);
-  return <section className={styles.section} aria-labelledby="home-categories">
-    <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>MULAI DARI YANG KAMU SUKA</p><h2 id="home-categories">Belanja berdasarkan kategori</h2></div>
-      <Link href="/products" className={styles.moreLink}>Semua produk<Icon name="arrow-right" /></Link></div>
-    {displayed.length ? <ul className={styles.categories}>{displayed.map((category, index) => <li key={category.id}>
-      <Link href={`/products?categoryId=${category.id}`} className={styles.categoryCard}>
-        <span className={styles.categoryIcon}><Icon name={index % 3 === 0 ? "box" : index % 3 === 1 ? "grid" : "store"} /></span>
-        <strong>{category.name}</strong><span>{formatNumber(category.productCount)} produk</span>
-        <Icon name="arrow-right" className={styles.categoryArrow} />
-      </Link></li>)}</ul> : <p className={styles.quietState} role="status">{unavailable ? "Kategori belum dapat dimuat. Kamu tetap dapat membuka katalog produk." : "Kategori akan tampil saat tersedia di katalog."}</p>}
-  </section>;
+type HomeCategoriesProps = {
+  categories: Category[];
+  unavailable: boolean;
+};
+
+export default function HomeCategories({ categories, unavailable }: HomeCategoriesProps) {
+  if (!categories.length) {
+    return (
+      <section className={styles.categorySection} aria-labelledby="home-categories">
+        <div className={styles.sectionHeading}><h2 id="home-categories">Kategori</h2></div>
+        <div className={styles.categoryState} role="status">
+        <p>{unavailable ? "Kategori belum dapat dimuat." : "Belum ada kategori tersedia."}</p>
+        {unavailable && <RefreshButton label="Coba kembali" />}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className={styles.categorySection} aria-labelledby="home-categories">
+      <div className={styles.sectionHeading}><h2 id="home-categories">Kategori</h2></div>
+      <nav className={styles.categoryMenu} aria-label="Kategori produk" tabIndex={0}>
+      <ul>
+        {categories.map((category) => (
+          <li key={category.id}>
+            <Link href={`/products?categoryId=${category.id}`}>
+              <span className={styles.categoryImage}><CategoryIcon name={category.name} /></span>
+              <span className={styles.categoryName}>{category.name}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      </nav>
+    </section>
+  );
 }

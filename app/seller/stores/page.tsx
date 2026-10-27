@@ -84,10 +84,6 @@ export default async function StoresPage({ searchParams }: PageProps) {
     redirect(`/seller/stores?page=${result.totalPages}`);
   }
 
-  const dateFormatter = new Intl.DateTimeFormat("id-ID", {
-    dateStyle: "medium",
-    timeZone: "Asia/Jakarta",
-  });
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

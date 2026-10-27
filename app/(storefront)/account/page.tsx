@@ -1,115 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-
 import { requireUser } from "@/lib/auth/guards";
 import Icon from "@/components/ui/Icon";
-import LogoutButton from "@/features/auth/LogoutButton";
-
-export const metadata: Metadata = {
-  title: "Akun Saya - NAVYCommerce",
-};
-
-const roleLabels = {
-  Customer: "Customer",
-  Seller: "Merchant",
-  SuperAdmin: "Super Admin",
-};
-
+import AccountPageHeader from "@/features/account/components/AccountPageHeader";
+import styles from "@/features/account/components/account.module.css";
+export const metadata:Metadata = { title:"Akun saya | NAVYCommerce", robots:{index:false,follow:false} };
+const roles = { Customer:"Pembeli", Seller:"Penjual", SuperAdmin:"Administrator" };
 export default async function AccountPage() {
   const user = await requireUser();
-
-  const details = [
-    { label: "Nama Lengkap", value: user.fullName },
-    { label: "Email", value: user.email },
-    { label: "Peran", value: roleLabels[user.role] },
-  ]
-
-  return (
-    <section
-      aria-labelledby="account-title"
-      className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 lg:py-16"
-    >
-      <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary">
-        Akun NAVYCommerce
-      </p>
-
-      <h1
-        id="account-title"
-        className="mt-3 text-3xl font-semibold tracking-tight text-foreground"
-      >
-        Akun saya
-      </h1>
-
-      <p className="mt-3 text-sm leading-6 text-muted">
-        Informasi akun yang sedang kamu gunakan.
-      </p>
-
-      <div className="mt-8 overflow-hidden rounded-3xl border border-border bg-surface shadow-sm">
-        <div className="flex items-center gap-4 border-b border-border p-6 sm:p-8">
-          <span
-            aria-hidden="true"
-            className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-xl font-semibold text-primary"
-          >
-            {user.fullName.charAt(0).toUpperCase()}
-          </span>
-
-          <div className="min-w-0">
-            <h2 className="break-words text-lg font-semibold text-foreground">
-              {user.fullName}
-            </h2>
-
-            <p className="mt-1 text-sm text-muted">
-              {roleLabels[user.role]}
-            </p>
-          </div>
-        </div>
-
-        <dl className="divide-y divide-border px-6 sm:px-8">
-          {details.map((detail) => (
-            <div
-              key={detail.label}
-              className="grid gap-2 py-5 sm:grid-cols-[160px_1fr] sm:gap-6"
-            >
-              <dt className="text-sm text-muted">
-                {detail.label}
-              </dt>
-
-              <dd className="break-words text-sm font-medium text-foreground">
-                {detail.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        {user.role === "Customer" && (
-          <div className="border-t border-border p-6 sm:px-8">
-            <Link href="/account/addresses" className="group flex items-center justify-between gap-4 rounded-2xl border border-border p-4 transition-colors hover:border-primary/40 hover:bg-primary/5">
-              <span>
-                <span className="block text-sm font-semibold text-foreground">Alamat pengiriman</span>
-                <span className="mt-1 block text-sm text-muted">Tambah alamat dan pilih tujuan pengiriman utama.</span>
-              </span>
-              <span className="text-primary transition-transform group-hover:translate-x-1"><Icon name="arrow-right" /></span>
-            </Link>
-          </div>
-        )}
-
-        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border bg-background/50 p-6 sm:px-8">
-          {user.role === "Seller" && (
-            <Link href="/seller" className="action-button">
-              Buka Seller Center
-            </Link>
-          )}
-          <Link
-            href="/"
-            className="rounded-lg px-2 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary-hover"
-          >
-            Kembali ke beranda
-          </Link>
-
-          <LogoutButton />
-        </div>
-      </div>
-    </section>
-  );
-
+  return <section>
+    <AccountPageHeader title="Informasi akun" description="Informasi akun yang sedang kamu gunakan."
+      action={user.role === "Seller" ? <Link href="/seller" className="action-button action-button--primary action-button--sm"><Icon name="store" />Seller Center<Icon name="arrow-right" /></Link> : undefined} />
+    <div className={styles.panel}>
+      <header className={styles.panelHeader}><Icon name="user" className="text-primary" /><div><h2>{user.fullName}</h2><p>{roles[user.role]}</p></div></header>
+      <dl className={styles.details}>{[{label:"Nama lengkap",value:user.fullName},{label:"Email",value:user.email},{label:"Jenis akun",value:roles[user.role]}].map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>
+      <div className={styles.actions}><Link href="/products" className="action-button action-button--ghost">Kembali ke katalog</Link></div>
+    </div>
+    {user.role === "Customer" && <div className={styles.shortcuts}>
+      <Link href="/account/addresses" className={styles.shortcut}><Icon name="store" /><div><h2>Alamat pengiriman</h2><p>Tambah alamat dan atur tujuan pengiriman utama.</p></div></Link>
+      <Link href="/orders" className={styles.shortcut}><Icon name="box" /><div><h2>Pesanan</h2><p>Buka kembali pesanan terakhir dari sesi browser ini.</p></div></Link>
+    </div>}
+  </section>;
 }

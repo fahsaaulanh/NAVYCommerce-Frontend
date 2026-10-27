@@ -17,7 +17,20 @@ function isObject(value: unknown): value is Record<string, unknown> {
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");
 
-  if (origin && origin !== new URL(request.url).origin) {
+  const expectedOrigin =
+    process.env.APP_ORIGIN ||
+    (process.env.NODE_ENV === "development"
+      ? new URL(request.url).origin
+      : null);
+
+  if (!expectedOrigin) {
+    return json(
+      { message: "Konfigurasi origin aplikasi belum tersedia." },
+      500,
+    );
+  }
+
+  if (!origin || origin !== expectedOrigin) {
     return json({ message: "Origin request tidak sesuai." }, 403);
   }
 

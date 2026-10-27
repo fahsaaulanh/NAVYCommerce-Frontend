@@ -34,7 +34,7 @@ export default function MarketplaceAccountMenu({ user }: { user: SessionUser | n
     <div className={styles.accountDropdown}>
       <div className={styles.dropdownIdentity}><strong>{user.fullName}</strong><span>{user.email}</span></div>
       <Link href="/account" onClick={close}><Icon name="user" />Akun saya</Link>
-      {user.role === "Customer" && <><Link href="/account/addresses" onClick={close}><Icon name="box" />Alamat pengiriman</Link><Link href="/cart" onClick={close}><Icon name="cart" />Keranjang belanja</Link></>}
+      {user.role === "Customer" && <><Link href="/orders" onClick={close}><Icon name="box" />Pesanan terakhir</Link><Link href="/account/addresses" onClick={close}><Icon name="box" />Alamat pengiriman</Link><Link href="/cart" onClick={close}><Icon name="cart" />Keranjang belanja</Link></>}
       {user.role === "Seller" && <><Link href="/seller" onClick={close}><Icon name="grid" />Seller Center</Link><Link href="/seller/stores" onClick={close}><Icon name="store" />Toko saya</Link></>}
       <div className={styles.dropdownLogout}><LogoutButton /></div>
     </div>

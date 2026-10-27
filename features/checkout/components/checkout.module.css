@@ -96,16 +96,7 @@
 @media (max-width: 1200px) { .layout { grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; } .item { grid-template-columns: 76px minmax(0, 1fr); gap: 12px; } .image { width: 76px; } .lineTotal { grid-column: 2; text-align: left; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; } }
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .summaryTotal { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; } }
 @media (max-width: 600px) { .page { padding: 20px 16px 36px; } .heading { margin-block: 22px; } .heading h1 { font-size: 28px; } .headerActions { width: 100%; } .panel { padding: 18px 16px; } .panelHeader h2 { font-size: 14px; } .panelHeader > button { padding: .6rem .8rem; min-height: 2.5rem; font-size: 11px; } .item { padding: 18px 16px; grid-template-columns: 72px minmax(0, 1fr); } .image { width: 72px; } .storeHeader, .storeShipping { padding-inline: 16px; } .dialogHeader { padding: 18px 16px; } .dialogHeader h2 { font-size: 16px; } .addressOptions { padding: 16px; } .addressOption { padding: 14px; } .dialogActions { padding: 14px 16px; } .state { padding: 24px; } }
-@media (min-width: 1024px) and (min-height: 740px) {
-  .page { height: 100%; min-height: 0; display: flex; flex-direction: column; padding-block: 18px 22px; }
-  .breadcrumb, .heading { flex-shrink: 0; }
-  .heading { margin-block: 18px; }
-  .heading h1 { font-size: 30px; }
-  .layout { flex: 1; min-height: 0; }
-  .contentColumn { min-height: 0; height: 100%; overflow-y: auto; overscroll-behavior-y: contain; align-content: start; grid-auto-rows: max-content; scrollbar-gutter: stable; padding-right: 8px; }
-  .desktopAction { display: block; }
-  .mobileBar { display: none; }
-}
+
 @media (max-height: 450px) { .mobileBar { display: none; } .desktopAction { display: block; } }
 @media (prefers-reduced-motion: reduce) { .addressOption { transition: none; } }
 
@@ -114,3 +105,6 @@
 .shippingControls p { margin-top: 5px; color: var(--muted); font-size: 11px; line-height: 1.8; }
 .partialShipping { display: block; margin-top: 4px; font-size: 10px; font-weight: 400; }
 @media (max-width: 600px) { .shippingControls { padding: 16px; } .shippingControls > button { width: 100%; } }
+
+.contentColumn { border:0; padding:0; margin:0; min-width:0; }
+@media(min-width:1024px) { .summary { position:sticky; top:24px; } .desktopAction { display:block; } .mobileBar { display:none; } }

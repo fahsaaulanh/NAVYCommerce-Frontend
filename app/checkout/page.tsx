@@ -7,6 +7,7 @@ import {
   checkoutHref,
   parseCheckoutSelection,
 } from "@/features/checkout/utils/selection";
+import CheckoutRecovery from "@/features/checkout/orders/components/CheckoutRecovery";
 import CheckoutView from "@/features/checkout/components/CheckoutView";
 import CheckoutState from "@/features/checkout/components/CheckoutState";
 
@@ -23,32 +24,27 @@ export default async function CheckoutPage({
     address?: string | string[];
   }>;
 }) {
-  await requireRole(["Customer"]);
+  const user = await requireRole(["Customer"]);
   const query = await searchParams;
   const ids = parseCheckoutSelection(query.items);
   if (!ids)
     return (
-      <CheckoutState
+      <><CheckoutRecovery customerId={user.id} /><CheckoutState
         title="Pilih barang untuk checkout"
         message="Buka keranjang dan pilih barang yang ingin kamu proses."
-      />
+      /></>
     );
   const requestedAddress =
     typeof query.address === "string" ? query.address.toLowerCase() : null;
-  let preview;
-  try {
-    preview = await loadCheckoutPreview(ids);
-  } catch (error) {
-    if (!(error instanceof BackendApiError)) throw error;
-    return (
-      <CheckoutState
-        title="Checkout belum dapat dimuat"
-        message={error.message}
-        status={error.status}
-        retryHref={checkoutHref(ids)}
-      />
-    );
-  }
+  const loaded = await loadCheckoutPreview(ids).then(preview => ({ preview, error:null }))
+    .catch((error: unknown) => {
+      if (!(error instanceof BackendApiError)) throw error;
+      return { preview:null, error };
+    });
+  if (loaded.error) return <><CheckoutRecovery customerId={user.id} /><CheckoutState
+    title="Checkout belum dapat dimuat" message={loaded.error.message}
+    status={loaded.error.status} retryHref={checkoutHref(ids)} /></>;
+  const preview = loaded.preview!;
   const requestedIsValid =
     requestedAddress !== null &&
     isAddressId(requestedAddress) &&
@@ -61,6 +57,7 @@ export default async function CheckoutPage({
       : (preview.addresses.find((address) => address.isDefault)?.id ?? null);
   return (
     <CheckoutView
+      customerId={user.id}
       key={`${ids.join(",")}:${initialAddressId ?? "none"}`}
       preview={preview}
       initialAddressId={initialAddressId}

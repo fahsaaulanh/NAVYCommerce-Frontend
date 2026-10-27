@@ -9,6 +9,7 @@ type Props = {
   title: string;
   description: string;
   confirmLabel: string;
+  cancelLabel?: string;
   pending: boolean;
   confirmDisabled?: boolean;
   error?: string;
@@ -16,7 +17,7 @@ type Props = {
   onClose: () => void;
 };
 
-export default function ConfirmDialog({ open, title, description, confirmLabel, pending, confirmDisabled = false, error, onConfirm, onClose }: Props) {
+export default function ConfirmDialog({ open, title, description, confirmLabel, cancelLabel = "Batal", pending, confirmDisabled = false, error, onConfirm, onClose }: Props) {
   const id = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function ConfirmDialog({ open, title, description, confirmLabel, 
       <p id={`${id}-description`}>{description}</p>
       {error && <p className={styles.error} role="alert">{error}</p>}
       <div className={styles.actions}>
-        <Button variant="outline" disabled={pending} onClick={onClose} autoFocus>Batal</Button>
+        <Button variant="outline" disabled={pending} onClick={onClose} autoFocus>{cancelLabel}</Button>
         <Button variant="danger" loading={pending} disabled={confirmDisabled} onClick={onConfirm}>{confirmLabel}</Button>
       </div>
     </div>

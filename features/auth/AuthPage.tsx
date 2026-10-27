@@ -20,8 +20,8 @@ import {
 type View = 'LOGIN' | 'REGISTER' | 'OTP';
 type Message = { text: string; error: boolean };
 const copy = {
-  LOGIN: { title: 'Selamat datang kembali', subtitle: 'Masuk untuk melanjutkan perjalananmu.' },
-  REGISTER: { title: 'Mulai bersama kami', subtitle: 'Buat akun untuk berbelanja atau membuka peluang usaha.' },
+  LOGIN: { title: 'Selamat datang kembali', subtitle: 'Masuk dengan email dan password akunmu.' },
+  REGISTER: { title: 'Buat akun', subtitle: 'Daftar untuk berbelanja atau membuka toko.' },
   OTP: { title: 'Verifikasi email', subtitle: 'Masukkan kode 6 digit yang dikirim ke email kamu.' },
 };
 

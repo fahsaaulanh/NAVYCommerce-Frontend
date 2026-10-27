@@ -44,14 +44,16 @@
   --color-danger-soft: var(--danger-soft);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: ui-monospace, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 @layer base {
@@ -66,40 +68,7 @@ body {
   }
 }
 
-/* Shared action style for <button> and navigation <Link>. */
 @layer components {
-  .action-button {
-    display: inline-flex;
-    min-height: 3rem;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    border-radius: 0.875rem;
-    padding: 0.75rem 1.25rem;
-    background-image: linear-gradient(110deg, var(--action-start), var(--action-end), var(--action-start));
-    background-size: 200% 100%;
-    background-position: 0% 50%;
-    color: var(--on-primary);
-    font-size: 0.875rem;
-    font-weight: 600;
-    box-shadow: 0 4px 12px -6px color-mix(in srgb, var(--primary) 45%, transparent);
-    transition: background-position 250ms ease, transform 200ms ease, box-shadow 200ms ease;
-  }
-
-  .action-button:focus-visible {
-    background-position: 100% 50%;
-  }
-
-  .action-button:not(:disabled):active {
-    transform: translateY(0);
-  }
-
-  .action-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-    box-shadow: none;
-  }
-
   .form-input {
     width: 100%;
     min-height: 3.75rem;
@@ -180,81 +149,6 @@ body {
   }
 }
 
-.action-button:not(:disabled):hover {
-  background-position: 100% 50%;
-  filter: brightness(0.8);
-  transform: translateY(-3px);
-
-  box-shadow:
-    0 12px 28px -8px
-    color-mix(in srgb, var(--primary) 55%, transparent);
-}
-
-.action-button:not(:disabled):active {
-  filter: brightness(0.75);
-  transform: translateY(0);
-}
-
-@media (hover: hover) {
-  .form-input:not(:disabled):hover:not(:focus) {
-    border-color:
-      color-mix(in srgb, var(--primary) 35%, var(--border));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-  .action-button,
-  .form-input,
-  .form-label {
-    transition: none;
-  }
-
-  .action-button:not(:disabled):hover {
-    transform: none;
-  }
-}
-
-/* Variasi tombol pendamping */
-.action-button.action-button--secondary {
-  background-image: none;
-  background-color: color-mix(in srgb, var(--primary) 8%, var(--surface));
-  color: var(--primary);
-  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
-  box-shadow: none;
-}
-
-.action-button.action-button--secondary:not(:disabled):hover,
-.action-button.action-button--secondary:focus-visible {
-  background-color: color-mix(in srgb, var(--primary) 14%, var(--surface));
-  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
-  filter: none;
-  box-shadow: 0 6px 16px -10px var(--primary);
-}
-
-/* Aksi tambahan */
-.action-button.action-button--ghost {
-  background-image: none;
-  background-color: transparent;
-  color: var(--muted);
-  box-shadow: none;
-}
-
-.action-button.action-button--ghost:not(:disabled):hover,
-.action-button.action-button--ghost:focus-visible {
-  background-color: color-mix(in srgb, var(--primary) 7%, var(--surface));
-  color: var(--primary);
-  filter: none;
-  box-shadow: none;
-}
-
-.action-button.action-button--secondary:not(:disabled):active,
-.action-button.action-button--ghost:not(:disabled):active {
-  transform: translateY(0);
-  filter: none;
-}
-
-/* Kartu toko */
 .store-card {
   position: relative;
   display: flex;
@@ -311,7 +205,8 @@ body {
   }
 }
 
-/* Shared buttons and links styled as buttons. */
+
+
 .action-button {
   --button-background: var(--primary);
   --button-hover-background: var(--primary-hover);
@@ -469,3 +364,4 @@ body {
     transform: none;
   }
 }
+html { scrollbar-gutter: stable; }

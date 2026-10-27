@@ -5,16 +5,17 @@ import styles from "./checkout.module.css";
 
 type Props = {
   subtotal: number; quantity: number; storeCount: number; hasAddress: boolean; hasProblems: boolean;
-  shippingCost: number; shippingComplete: boolean; shippingCount: number; hasQuote: boolean; pending: boolean;
+  shippingCost: number; shippingComplete: boolean; shippingCount: number; hasQuote: boolean; pending: boolean; submitting: boolean; unresolved: boolean; onSubmit: () => void;
 };
 export default function CheckoutSummary({ subtotal, quantity, storeCount, hasAddress, hasProblems,
-  shippingCost, shippingComplete, shippingCount, hasQuote, pending }: Props) {
+  shippingCost, shippingComplete, shippingCount, hasQuote, pending, submitting, unresolved, onSubmit }: Props) {
   const reason = hasProblems ? "Periksa barang yang perlu diperbaiki di keranjang."
     : !hasAddress ? "Lengkapi alamat pengiriman terlebih dahulu."
     : pending ? "Sedang menghitung pilihan ongkir."
     : !hasQuote ? "Hitung ongkir untuk melihat pilihan pengiriman."
     : !shippingComplete ? "Lengkapi pilihan layanan pengiriman untuk setiap toko."
-    : "Demo sampai review checkout. Pembuatan pesanan belum tersedia.";
+    : "Dengan membuat pesanan, stok ditahan sementara. Pembayaran belum tersedia pada demo ini.";
+  const disabled = !unresolved && (hasProblems || !hasAddress || !shippingComplete || pending || quantity < 1);
   const total = subtotal + (shippingComplete ? shippingCost : 0);
   const totalLabel = shippingComplete ? "Total belanja" : "Subtotal produk";
   return <>
@@ -30,12 +31,12 @@ export default function CheckoutSummary({ subtotal, quantity, storeCount, hasAdd
         </dd></div>
       </dl>
       <div className={styles.summaryTotal}><span>{totalLabel}</span><strong>{formatCurrency(total)}</strong></div>
-      <div className={styles.desktopAction}><Button disabled className="w-full" icon={<Icon name="arrow-right" />}>Buat pesanan</Button></div>
+      <div className={styles.desktopAction}><Button disabled={disabled} loading={submitting} onClick={onSubmit} className="w-full" icon={<Icon name="arrow-right" />}>{unresolved ? "Periksa pesanan" : "Buat pesanan"}</Button></div>
       <p className={styles.summaryReason}>{reason}</p>
     </aside>
     <div className={styles.mobileBar} role="region" aria-label="Total dan aksi checkout">
       <a href="#checkout-summary"><span>{totalLabel}</span><strong>{formatCurrency(total)}</strong><small>Lihat rincian ↑</small></a>
-      <Button disabled size="sm" icon={<Icon name="arrow-right" />}>Buat pesanan</Button>
+      <Button disabled={disabled} loading={submitting} onClick={onSubmit} size="sm" icon={<Icon name="arrow-right" />}>{unresolved ? "Periksa pesanan" : "Buat pesanan"}</Button>
     </div>
   </>;
 }

@@ -1,12 +1,13 @@
 import "server-only";
 import { BackendApiError } from "@/lib/api/server";
-import { catalogApi, getCatalogCategories } from "@/features/products/api/catalog-api";
+import { catalogApi } from "@/features/products/api/catalog-api";
+import { categoryApi } from "@/features/categories/category-api";
 import { readCatalogQuery } from "@/features/products/utils/catalog-query";
 
 export async function loadHomeData() {
   const [products, categories] = await Promise.allSettled([
     catalogApi.getProducts(readCatalogQuery({ sort: "newest", inStock: "true" })),
-    getCatalogCategories(),
+    categoryApi.getPublic(),
   ]);
   for (const result of [products, categories]) {
     if (result.status === "rejected" && !(result.reason instanceof BackendApiError)) throw result.reason;

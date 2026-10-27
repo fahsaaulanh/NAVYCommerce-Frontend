@@ -14,9 +14,9 @@ export default function MarketplaceNavbar({ user, categories = [], cartQuantity 
     <header className={styles.header}>
       <div className={styles.topline}>
         <div className={`${styles.container} ${styles.toplineInner}`}>
-          <span>Temukan pilihanmu dari beragam toko.</span>
+          <span>Belanja dari berbagai toko dalam satu tempat.</span>
           <Link href={user?.role === "Seller" ? "/seller" : user ? "/account" : "/auth"}>
-            {user?.role === "Seller" ? "Seller Center" : "Mulai dari akunmu"}
+            {user?.role === "Seller" ? "Seller Center" : "Akun saya"}
           </Link>
         </div>
       </div>

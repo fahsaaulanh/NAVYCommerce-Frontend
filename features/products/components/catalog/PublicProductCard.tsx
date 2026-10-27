@@ -52,7 +52,7 @@ export default function PublicProductCard({
           <p className={styles.cardRange}>
             {product.minPrice !== product.maxPrice
               ? `Hingga ${formatCurrency(product.maxPrice)}`
-              : "Harga produk"}
+              : product.hasStock ? "Stok tersedia" : "Stok habis"}
           </p>
           <div className={styles.cardStore}>
             <Icon name="store" className="size-3.5" />

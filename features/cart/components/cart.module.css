@@ -1,10 +1,10 @@
-.page { width: 100%; max-width: 1440px; margin-inline: auto; padding: 28px 32px 72px; }
+.page { width: 100%; max-width: 1440px; margin-inline: auto; padding: 20px 32px 48px; }
 .breadcrumb { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 12px; }
 .breadcrumb a:hover { color: var(--primary); }
-.heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-block: 32px; }
+.heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-block: 16px; }
 .eyebrow { color: var(--primary); font-size: 10px; letter-spacing: .12em; font-weight: 700; }
-.heading h1 { font-size: clamp(26px, 3vw, 36px); line-height: 1.2; letter-spacing: -.035em; font-weight: 700; margin-top: 7px; }
-.heading p:not(.eyebrow) { color: var(--muted); font-size: 13px; margin-top: 12px; }
+.heading h1 { font-size: 24px; line-height: 1.2; letter-spacing: -.035em; font-weight: 600; margin-top: 0; }
+.heading p:not(.eyebrow) { color: var(--muted); font-size: 13px; margin-top: 4px; }
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; align-items: start; gap: 28px; }
 .itemsColumn { display: grid; gap: 18px; min-width: 0; }
 .toolbar { background: var(--surface); padding: 17px 22px; border: 1px solid var(--border); border-radius: 14px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
@@ -84,25 +84,17 @@
 .skeleton { min-height: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
 @media (max-width: 1200px) { .layout { grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; } .lineTotal { grid-column: 3 / -1; text-align: left; display: flex; align-items: baseline; gap: 8px; } .item { grid-template-columns: 17px 100px minmax(0, 1fr); gap: 14px; } .image { width: 100px; } }
 @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .summaryTotal { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; } }
-@media (max-width: 600px) { .page { padding: 22px 16px 40px; } .heading { margin-block: 26px; gap: 16px; } .heading h1 { font-size: 28px; } .item { grid-template-columns: 17px 80px minmax(0, 1fr); padding: 20px 14px; gap: 11px; } .image { width: 80px; border-radius: 9px; } .storeHeader { padding: 14px; gap: 10px; } .storeCount { font-size: 10px; } .itemTitle { font-size: 13px; } .itemActions .quantity { width: 100%; justify-content: space-between; } .itemActions .quantity input { flex: 1; max-width: 100px; } .toolbar { padding: 15px; } .summary { padding: 22px; } .empty { padding: 42px 20px; } .empty h2 { font-size: 22px; } }
+@media (max-width: 600px) { .page { padding: 22px 16px 40px; } .heading { margin-block: 14px; gap: 12px; } .heading h1 { font-size: 22px; } .item { grid-template-columns: 17px 80px minmax(0, 1fr); padding: 20px 14px; gap: 11px; } .image { width: 80px; border-radius: 9px; } .storeHeader { padding: 14px; gap: 10px; } .storeCount { font-size: 10px; } .itemTitle { font-size: 13px; } .itemActions .quantity { width: 100%; justify-content: space-between; } .itemActions .quantity input { flex: 1; max-width: 100px; } .toolbar { padding: 15px; } .summary { padding: 22px; } .empty { padding: 42px 20px; } .empty h2 { font-size: 22px; } }
 @media (prefers-reduced-motion: reduce) { .image img, .quantity button { transition: none; } .image:hover img { transform: none; } }
 
-/* Desktop: hanya kolom barang yang menggulir di dalam area kerja. */
-@media (min-width: 1024px) and (min-height: 740px) {
-  .page { height: 100%; min-height: 0; display: flex; flex-direction: column; padding-block: 20px 24px; }
-  .breadcrumb, .heading { flex-shrink: 0; }
-  .heading { margin-block: 20px; gap: 16px; }
-  .heading h1 { font-size: 30px; }
-  .heading p:not(.eyebrow) { margin-top: 8px; }
-  .layout { flex: 1; min-height: 0; }
-  .itemsColumn { min-height: 0; height: 100%; overflow-y: auto; overscroll-behavior-y: contain; align-content: start; grid-auto-rows: max-content; scrollbar-gutter: stable; padding-right: 8px; }
-  .toolbar { position: sticky; top: 0; z-index: 2; }
-  .desktopCheckout { display: block; }
-  .checkoutBar { display: none; }
-}
 
-/* Pada jendela sangat pendek, utamakan akses seluruh konten. */
+
+
+
 @media (max-height: 450px) {
   .checkoutBar { display: none; }
   .desktopCheckout { display: block; }
 }
+
+.itemsColumn { border:0; padding:0; margin:0; min-width:0; }
+@media(min-width:1024px) { .summary { position:sticky; top:24px; } .desktopCheckout { display:block; } .checkoutBar { display:none; } }
